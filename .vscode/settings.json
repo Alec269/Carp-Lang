@@ -1,0 +1,30 @@
+{
+   "cmake.buildDirectory": "${workspaceFolder}/out/build/",
+   "files.associations": {
+      "*.h": "c",
+      "*.hpp": "cpp",
+      "*.cpp": "cpp",
+      "*.c": "c"
+   },
+   "cSpell.language": "en_GB",
+   "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 3, TabWidth: 3 }",
+   "cmake.generator": "Ninja",
+   "cSpell.words": [
+      "Allman",
+      "buildsystems",
+      "janky",
+      "msvc",
+      "MSVC",
+      "prvnts",
+      "vcpkg"
+   ],
+   "debug.enableStatusBarColor": false,
+   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+   "C_Cpp.default.compileCommands": [
+      "out\\build\\VsNinja\\compile_commands.json"
+   ],
+   "clangd.arguments": [
+      "--compile-commands-dir=out/build/VsNinja"
+   ],
+   "files.eol": "\r\n"
+}

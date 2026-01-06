@@ -1,0 +1,45 @@
+{
+   "version": 8,
+   "configurePresets": [
+      {
+         "name": "vsx64",
+         "displayName": "vsx64",
+         "description": "Using compilers for Visual Studio 17 2022 (x64 architecture)",
+         "generator": "Visual Studio 17 2022",
+         "toolset": "host=x64",
+         "architecture": "x64",
+         "binaryDir": "${sourceDir}/out/build/${presetName}",
+         "cacheVariables": {
+            "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+            "CMAKE_C_COMPILER": "cl.exe",
+            "CMAKE_CXX_COMPILER": "cl.exe"
+         }
+      },
+      {
+         "name": "VsNinja",
+         "displayName": "VsNinja",
+         "description": "Using compilers for Visual Studio 17 2022 (x64 architecture)",
+         "generator": "Ninja",
+         "binaryDir": "${sourceDir}/out/build/${presetName}",
+         "cacheVariables": {
+            "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+            "CMAKE_C_COMPILER": "cl.exe",
+            "CMAKE_CXX_COMPILER": "cl.exe"
+         }
+      }
+   ],
+   "buildPresets": [
+      {
+         "name": "vsx64-debug",
+         "displayName": "vsx64 Debug",
+         "configurePreset": "vsx64",
+         "configuration": "Debug"
+      },
+      {
+         "name": "VsNinja-debug",
+         "displayName": "VsNinja Debug",
+         "configurePreset": "VsNinja",
+         "configuration": "Debug"
+      }
+   ]
+}
