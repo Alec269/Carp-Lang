@@ -88,3 +88,47 @@ AST (what's needed)
 
 - Removes useless syntax
 - Keeps only meaning
+
+---
+
+[v0.0.2]
+
+```carp
+
+```
+
+Compiler output:
+
+```sh
+TokenType order : 0 | Textual: 'int' Pos: 2:1
+TokenType order : 12 | Textual: 'x' Pos: 2:5
+TokenType order : 19 | Textual: '=' Pos: 2:7
+TokenType order : 13 | Textual: '5' Pos: 2:9
+TokenType order : 20 | Textual: ';' Pos: 2:10
+TokenType order : 4 | Textual: 'float' Pos: 4:1
+TokenType order : 12 | Textual: 'z' Pos: 4:7
+TokenType order : 19 | Textual: '=' Pos: 4:9
+TokenType order : 13 | Textual: '3' Pos: 4:11
+TokenType order : 20 | Textual: ';' Pos: 4:12
+TokenType order : 3 | Textual: 'string' Pos: 5:1
+TokenType order : 12 | Textual: 'msg' Pos: 5:8
+TokenType order : 19 | Textual: '=' Pos: 5:12
+TokenType order : 14 | Textual: 'hello world' Pos: 5:14
+TokenType order : 20 | Textual: ';' Pos: 5:27
+TokenType order : 36 | Textual: '' Pos: 6:1
+VarDeclStmt
+ type: int
+ name: x
+ init:
+  NumberExpr(5)
+VarDeclStmt
+ type: float
+ name: z
+ init:
+  NumberExpr(3)
+VarDeclStmt
+ type: string
+ name: msg
+ init:
+  StringExpr("hello world")
+```

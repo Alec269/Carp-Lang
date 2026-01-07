@@ -5,6 +5,7 @@
 #include <print>
 #include <sstream>
 
+#include "headers/parser.hpp"
 #include "headers/tokeniser.hpp"
 
 int main( int argc, char* argv[] )
@@ -30,6 +31,20 @@ int main( int argc, char* argv[] )
 	for ( const auto& t : tokens ) {
 		std::cout << "TokenType order : " << static_cast<int>( t.type ) << " | Textual: '" << t.value
 					 << "' " << "Pos: " << t.loc.line << ":" << t.loc.column << '\n';
+	}
+
+	try {
+
+		Parser parser( tokens );		// pass tokens to the parser
+		auto nodes = parser.parse();	// start parsing and store in nodes
+
+		for ( const auto& stmt : nodes ) {
+			stmt->print();
+		}
+
+	} catch ( const std::exception& e ) {
+
+		std::cerr << "Parse Error: " << e.what() << '\n';
 	}
 
 	return 0;

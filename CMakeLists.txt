@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 #)
 
 # 2️⃣ Now declare the project (this detects the compiler)
-project(CarpLang LANGUAGES CXX)
+project(CarpLang VERSION 0.0.15 LANGUAGES CXX)
 
 # 3️⃣ C++ standard
 set(CMAKE_CXX_STANDARD 23)
@@ -24,7 +24,9 @@ add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PUBLIC
     src/main.cpp
     src/tokeniser.cpp
+    src/parser.cpp
     src/headers/tokeniser.hpp
+    src/headers/parser.hpp
 )
 
 # C++ Modules MUST go in a FILE_SET

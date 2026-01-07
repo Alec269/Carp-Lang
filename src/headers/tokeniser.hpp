@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <vector>
 
+// # Global Data
+
 // strongly typed list of tokentypes
 enum class TokenType	 // enum class is safer than enum & prvnts name collisions
 {
@@ -79,6 +81,8 @@ struct Token {
 	std::string value;  // value = what text it came from
 	Location loc;		  // Location = where it is
 };
+
+// # End of Global data
 
 class Tokeniser {
 
