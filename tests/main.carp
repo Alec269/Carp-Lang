@@ -1,4 +1,42 @@
+// variable declarations
+int x = 5;
+long y = 10;
+float z = 3;
+string msg = "hello world";
 
-   int x = 5;
-    k
+// identifiers without keywords
+foo
+bar123
+_baz
+
+// comparison operators
+x == y;
+x != z;
+x < y;
+x <= y;
+x > y;
+x >= y;
+
+// grouping
+(x);
+{ x; }
+[ y ];
+
+// commas
+foo, bar, baz;
+
+// empty constructs
+()
+{}
+[]
+
+// mixed
+if (x == 5) {
+    msg = "value is five";
+}
+
+for(){};
+
+// return statement
+return x;
 

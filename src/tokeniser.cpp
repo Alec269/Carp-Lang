@@ -94,8 +94,11 @@ std::vector<Token> Tokeniser::tokenise()
 			// if we get non-quoted text the extract it for comparison
 			std::string txt = m_source.substr( startIndex, m_index - startIndex );
 			// if the piece of text matches then add correct token
-			if ( txt == "int" ) {
-				addToken( TokenType::T_int, txt, startColumn );
+			//@ match Tokens
+			auto tryKey = g_keywords.find( txt );
+			if ( tryKey != g_keywords.end() ) {
+				addToken( tryKey->second, txt, startColumn );
+				// second means the 2nd part of a key of the map
 			} else {
 				addToken( TokenType::T_identifier, txt, startColumn );
 			}
@@ -107,6 +110,30 @@ std::vector<Token> Tokeniser::tokenise()
 		the outer condition ensures that
 		and in the inner "if" we're asking "can this char continue the id name"
 		*/
+
+		//* string literals
+		if ( c == '"' ) {
+			size_t startColumn = m_column;
+			advance();							// consume opening quote
+			size_t startIndex = m_index;	// define startIndex where the string actually starts
+
+			while ( peek() != '"' && peek() != '\0' ) {	// look ahead without moving
+				if ( peek() == '\n' ) {
+					throw std::runtime_error( "Unterminated string literal" );	// error if newline
+				}
+				advance();	// keep consuming chars until we reach char before either " or \0
+			}
+			if ( peek() == '\0' ) {	 // checks the next char
+				throw std::runtime_error( "Unterminated string literal" );
+				// If the loop finishes because it hit the end of the file (\0) rather than a closing
+				// quote, it’s a syntax error.
+			}	// if this doesn't trigger the next char is "
+			std::string value = m_source.substr( startIndex, m_index - startIndex );
+			advance();	// consume closing "
+
+			addToken( TokenType::T_strLit, value, startColumn );
+			continue;
+		}
 
 		// here we compare chars for token assignment
 		// {} bcs of needing to define startcolumn per case
@@ -132,13 +159,34 @@ std::vector<Token> Tokeniser::tokenise()
 		case '/': {
 			size_t startColumn = m_column;
 			advance();
-			addToken( TokenType::T_slash, "/", startColumn );
-			break;
-		}
-		case '=': {
-			size_t startColumn = m_column;
-			advance();
-			addToken( TokenType::T_eq, "=", startColumn );
+			if ( peek() == '/' ) {
+				// single line
+				while ( peek() != '\n' && peek() != '\0' ) {
+					advance();
+				}
+			} else if ( peek() == '*' ) {
+				// multiline
+				advance();
+				while ( true ) {
+					if ( peek() == '\0' ) {
+						throw std::runtime_error( "Unterminated comment" );
+					}
+					if ( peek() == '*' && m_source[ m_index + 1 ] == '/' ) {
+						advance();
+						advance();
+						break;
+					}
+					if ( peek() == '\n' ) {
+						m_line++;
+						m_column = 1;
+					}
+					advance();
+				}
+
+			} else {
+
+				addToken( TokenType::T_slash, "/", startColumn );
+			}
 			break;
 		}
 		case ';': {
@@ -147,11 +195,99 @@ std::vector<Token> Tokeniser::tokenise()
 			addToken( TokenType::T_semi, ";", startColumn );
 			break;
 		}
-
+		case '(': {
+			size_t startColumn = m_column;
+			advance();
+			addToken( TokenType::T_LBrack, "(", startColumn );
+			break;
+		}
+		case ')': {
+			size_t startColumn = m_column;
+			advance();
+			addToken( TokenType::T_RBrack, ")", startColumn );
+			break;
+		}
+		case '{': {
+			size_t startColumn = m_column;
+			advance();
+			addToken( TokenType::T_LBrace, "{", startColumn );
+			break;
+		}
+		case '}': {
+			size_t startColumn = m_column;
+			advance();
+			addToken( TokenType::T_RBrace, "}", startColumn );
+			break;
+		}
+		case '[': {
+			size_t startColumn = m_column;
+			advance();
+			addToken( TokenType::T_LSquare, "[", startColumn );
+			break;
+		}
+		case ']': {
+			size_t startColumn = m_column;
+			advance();
+			addToken( TokenType::T_RSquare, "]", startColumn );
+			break;
+		}
+		case ',': {
+			size_t startColumn = m_column;
+			advance();
+			addToken( TokenType::T_comma, ",", startColumn );
+			break;
+		}
+		case '=': {
+			size_t startColumn = m_column;
+			advance();
+			if ( peek() == '=' ) {
+				advance();
+				addToken( TokenType::T_eqEq, "==", startColumn );
+			} else {
+				addToken( TokenType::T_eq, "=", startColumn );
+			}
+			break;
+		}
+		case '!': {
+			size_t startColumn = m_column;
+			advance();
+			if ( peek() == '=' ) {
+				advance();
+				addToken( TokenType::T_NotE, "!=", startColumn );
+			} else {
+				throw std::runtime_error( "Unexpected '!'" );
+			}
+			break;
+		}
+		case '<': {
+			size_t startColumn = m_column;
+			advance();
+			if ( peek() == '=' ) {
+				advance();
+				addToken( TokenType::T_LeTEq, "<=", startColumn );
+			} else {
+				addToken( TokenType::T_LeT, "<", startColumn );
+			}
+			break;
+		}
+		case '>': {
+			size_t startColumn = m_column;
+			advance();
+			if ( peek() == '=' ) {
+				advance();
+				addToken( TokenType::T_GrTEq, ">=", startColumn );
+			} else {
+				addToken( TokenType::T_GrT, ">", startColumn );
+			}
+			break;
+		}
 		default:
 			// for now crashes if a symbol doesn't match (lose text etc. becomes ids)
-			throw std::runtime_error( std::string( "Unkown character: " ) + c );
+			throw std::runtime_error( "Unknown character at " + std::to_string( m_line ) + ":" +
+											  std::to_string( m_column ) );
 		}
 	}
+
+	addToken( TokenType::T_EOF, "", m_column );	// end of file
 	return m_tokens;	// return the tokens for further use, such as parsing
 }

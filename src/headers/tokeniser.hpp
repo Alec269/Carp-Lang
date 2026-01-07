@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // strongly typed list of tokentypes
@@ -8,6 +9,17 @@ enum class TokenType	 // enum class is safer than enum & prvnts name collisions
 {
 	// Keywords
 	T_int,
+	T_long,
+	T_char,
+	T_string,
+	T_float,
+	T_double,
+	T_any,
+	T_if,
+	T_else,
+	T_while,
+	T_return,
+	T_for,
 
 	// Ids and Litereals
 	T_identifier,
@@ -21,6 +33,17 @@ enum class TokenType	 // enum class is safer than enum & prvnts name collisions
 	T_slash,	 // division symbol /
 	T_eq,
 	T_semi,
+	T_comma,
+
+	// doubled operators
+	T_eqEq,
+	T_NotE,
+	T_PlusE,
+	T_MinusE,
+	T_LeT,
+	T_LeTEq,
+	T_GrT,
+	T_GrTEq,
 
 	// brackets
 	T_LBrack,
@@ -29,6 +52,19 @@ enum class TokenType	 // enum class is safer than enum & prvnts name collisions
 	T_RBrace,
 	T_LSquare,
 	T_RSquare,
+
+	// end of file
+	T_EOF
+};
+
+// this way we won't have to do manual comparisons
+static const std::unordered_map<std::string, TokenType> g_keywords = {
+	{ "int", TokenType::T_int },		  { "long", TokenType::T_long },
+	{ "char", TokenType::T_char },	  { "string", TokenType::T_string },
+	{ "float", TokenType::T_float },	  { "double", TokenType::T_double },
+	{ "any", TokenType::T_any },		  { "if", TokenType::T_if },
+	{ "else", TokenType::T_else },	  { "while", TokenType::T_while },
+	{ "return", TokenType::T_return }, { "for", TokenType::T_for },
 };
 
 // where token appears

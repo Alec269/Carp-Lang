@@ -1,7 +1,7 @@
 # --- Configuration ---
 $ConfigPreset = 'VsNinja'
 $BuildPreset = 'VsNinja-debug'
-$ExecutablePath = 'D:\1.Programe\C-Cpp\Compilers\Crap\out\build\bin\crap-comp.exe'
+$ExecutablePath = 'D:/1.Programe/C-Cpp/Compilers/Crap/out/build/bin/CarpLang.exe'
 $TestFile = 'tests\main.carp'
 
 # 1. Configure the project

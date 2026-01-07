@@ -1,0 +1,15 @@
+{
+   "configurations": [
+      {
+         "type": "lldb",
+         "request": "launch",
+         "name": "Launch",
+         "program": "${workspaceFolder}/out/build/bin/CarpLang.exe",
+         // "program": "${workspaceFolder}/out/build/bin/Debug/CarpLang.exe",
+         "args": [
+            "${workspaceFolder}/tests/main.carp"
+         ],
+         "cwd": "${workspaceFolder}"
+      }
+   ]
+}
