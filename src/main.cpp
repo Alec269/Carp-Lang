@@ -24,15 +24,18 @@ int main( int argc, char* argv[] )
 	std::stringstream buffer;
 	buffer << fileIn.rdbuf();	// read file add put into buffer stream
 
+	//@ Tokeniser
 	Tokeniser tokeniser( buffer.str() );  // conv to str and give to tokeniser
 	auto tokens = tokeniser.tokenise();	  // get the returned tokens from the tokeniser
 
-	// example output for debugging
+	// # Token output for debugging
 	for ( const auto& t : tokens ) {
-		std::cout << "TokenType order : " << static_cast<int>( t.type ) << " | Textual: '" << t.value
-					 << "' " << "Pos: " << t.loc.line << ":" << t.loc.column << '\n';
+		std::cout << "TokenType order : " << static_cast<int>( t.type ) << " | Textual: '" << MAGENTA
+					 << t.value << CoRESET << "' " << "Pos: " << GREEN << t.loc.line << ":"
+					 << t.loc.column << CoRESET << '\n';
 	}
 
+	// @ Parser
 	try {
 
 		Parser parser( tokens );		// pass tokens to the parser
@@ -42,9 +45,9 @@ int main( int argc, char* argv[] )
 			stmt->print();
 		}
 
-	} catch ( const std::exception& e ) {
+	} catch ( const std::exception& err ) {
 
-		std::cerr << "Parse Error: " << e.what() << '\n';
+		std::cerr << RED << "Parse Error: " << err.what() << CoRESET << "\n";
 	}
 
 	return 0;

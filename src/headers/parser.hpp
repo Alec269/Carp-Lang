@@ -5,81 +5,9 @@
 #include <string>
 
 #include "tokeniser.hpp"
+#include "utils.hpp"
 
 // # Global Data
-inline void indent( int n )
-{
-	for ( int i = 0; i < n; ++i ) {
-		std::cout << " ";
-	}
-}
-
-inline std::string tokenTypeToString( TokenType t )
-{
-	switch ( t ) {
-	case TokenType::T_int:
-		return "int";
-	case TokenType::T_float:
-		return "float";
-	case TokenType::T_string:
-		return "string";
-
-	case TokenType::T_identifier:
-		return "identifier";
-	case TokenType::T_numLit:
-		return "number";
-	case TokenType::T_strLit:
-		return "string literal";
-
-	case TokenType::T_eq:
-		return "=";
-	case TokenType::T_eqEq:
-		return "==";
-	case TokenType::T_NotE:
-		return "!=";
-	case TokenType::T_LeT:
-		return "<";
-	case TokenType::T_LeTEq:
-		return "<=";
-	case TokenType::T_GrT:
-		return ">";
-	case TokenType::T_GrTEq:
-		return ">=";
-
-	case TokenType::T_plus:
-		return "+";
-	case TokenType::T_minus:
-		return "-";
-	case TokenType::T_star:
-		return "*";
-	case TokenType::T_slash:
-		return "/";
-
-	case TokenType::T_semi:
-		return ";";
-	case TokenType::T_comma:
-		return ",";
-
-	case TokenType::T_LBrack:
-		return "(";
-	case TokenType::T_RBrack:
-		return ")";
-	case TokenType::T_LBrace:
-		return "{";
-	case TokenType::T_RBrace:
-		return "}";
-	case TokenType::T_LSquare:
-		return "[";
-	case TokenType::T_RSquare:
-		return "]";
-
-	case TokenType::T_EOF:
-		return "<EOF>";
-
-	default:
-		return "<unknown token>";
-	}
-}
 
 // default expression type
 struct Expr {
@@ -95,7 +23,7 @@ struct NumberExpr : Expr {
 	void print( int indentLevel ) const override
 	{
 		indent( indentLevel );
-		std::cout << "NumberExpr(" << value << ")\n";
+		std::cout << "NumberExpr(" << YELLOW << value << CoRESET << ")\n";
 	}
 };
 
@@ -106,7 +34,7 @@ struct StringExpr : Expr {
 	void print( int indentLevel ) const override
 	{
 		indent( indentLevel );
-		std::cout << "StringExpr(\"" << value << "\")\n";
+		std::cout << "StringExpr(\"" << YELLOW << value << CoRESET << "\")\n";
 	}
 };
 
@@ -117,7 +45,7 @@ struct IdentExpr : Expr {
 	void print( int indentLevel ) const override
 	{
 		indent( indentLevel );
-		std::cout << "IdentExpr(" << name << ")\n";
+		std::cout << "IdentExpr(" << YELLOW << name << CoRESET << ")\n";
 	}
 };
 
@@ -155,10 +83,10 @@ struct VarDeclStmt : Stmt {
 		std::cout << "VarDeclStmt\n";
 
 		indent( indentLevel + 1 );
-		std::cout << "type: " << tokenTypeToString( type ) << "\n";
+		std::cout << "type: " << BLUE << tokenTypeToString( type ) << CoRESET << "\n";
 
 		indent( indentLevel + 1 );
-		std::cout << "name: " << name << "\n";
+		std::cout << "name: " << GREEN << name << CoRESET << "\n";
 
 		indent( indentLevel + 1 );
 		std::cout << "init:\n";
