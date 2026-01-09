@@ -36,7 +36,7 @@ const Token& Parser::expect( TokenType type, const char* msg )
 	return advance();	 // if matches then go ahead
 }
 
-// primary expression skeleton
+// primary expression(numlit ,id, strlit) skeleton
 std::unique_ptr<Expr> Parser::parsePrimary()
 {
 	if ( match( TokenType::T_numLit ) ) {
@@ -61,7 +61,6 @@ std::unique_ptr<Expr> Parser::parseExpression()
 }
 
 std::unique_ptr<Stmt> Parser::parseVarDecl()
-
 {	// a var decl should start with a type - int/float/string
 	TokenType type = advance().type;
 	// ↑ Consume the current type token (int / float / string) and record its kind
@@ -79,6 +78,66 @@ std::unique_ptr<Stmt> Parser::parseVarDecl()
 	return std::make_unique<VarDeclStmt>( type, nameToken.value, std::move( init ) );
 }
 
+std::unique_ptr<Stmt> Parser::parseAssignment()
+{
+	const Token& name = expect( TokenType::T_identifier, "Expected identifier" );
+	expect( TokenType::T_eq, "Expected '='" );
+	auto value = parseExpression();
+	expect( TokenType::T_semi, "Expected ';'" );
+
+	return std::make_unique<AssignStmt>( name.value, std::move( value ) );
+}
+
+std::unique_ptr<Stmt> Parser::parseIfStmt()
+{
+	// consume if
+	expect( TokenType::T_if, "Expected 'if'" );
+	// expect '('
+	expect( TokenType::T_LBrack, "Expect '(' after 'if'" );
+	// parse the condition  expr
+	auto condition = parseExpression();
+	// expect ')'
+	expect( TokenType::T_RBrack, "Expect ')' after 'condition'" );
+
+	auto thenBranch = parseStatement();	 // get the if body
+
+	// optional else branch
+	std::unique_ptr<Stmt> elseBranch = nullptr;
+	if ( match( TokenType::T_else ) ) {
+		elseBranch = parseStatement();
+	}
+
+	return std::make_unique<IfStmt>( std::move( condition ), std::move( thenBranch ),
+												std::move( elseBranch ) );
+}
+
+std::unique_ptr<Stmt> Parser::parseWhileStmt()
+{
+	// consume if
+	expect( TokenType::T_while, "Expected 'while'" );
+	// expect '('
+	expect( TokenType::T_LBrack, "Expect '(' after 'while'" );
+	// parse the condition  expr
+	auto condition = parseExpression();
+	// expect ')'
+	expect( TokenType::T_RBrack, "Expect ')' after 'condition'" );
+	auto whileBody = parseStatement();	// get the body
+	return std::make_unique<WhileStmt>( std::move( condition ), std::move( whileBody ) );
+}
+
+std::unique_ptr<Stmt> Parser::parseBlock()
+{
+	expect( TokenType::T_LBrace, "Expected '{'" );
+
+	auto block = std::make_unique<BlockStmt>();
+
+	while ( peek().type != TokenType::T_RBrace && peek().type != TokenType::T_EOF ) {
+		block->statements.push_back( parseStatement() );
+	}
+	expect( TokenType::T_RBrace, "Expected '}'" );
+	return block;
+}
+
 std::unique_ptr<Stmt> Parser::parseStatement()
 {
 	// Dispatches to the correct statement parser based on the current token
@@ -87,6 +146,14 @@ std::unique_ptr<Stmt> Parser::parseStatement()
 	case TokenType::T_float:
 	case TokenType::T_string:
 		return parseVarDecl();
+	case TokenType::T_identifier:
+		return parseAssignment();
+	case TokenType::T_if:
+		return parseIfStmt();
+	case TokenType::T_LBrace:
+		return parseBlock();
+	case TokenType::T_while:
+		return parseWhileStmt();
 
 	default:
 		throw std::runtime_error( "Unknown statement" );
@@ -119,26 +186,4 @@ Important:
 - The token can disappear later
 - The AST survives independently
 
-## Why returning a token pointer would be WRONG
-
-very common beginner mistake:
-
-```cpp
-struct NumberExpr : Expr {
-	const Token& tok;
-};
-```
-
-Why this breaks later
-
-- Tokens are a temporary frontend structure
-- AST is a long-lived semantic structure
-- Later passes (type checking, codegen) should NOT depend on lexer state
-
-Real compilers follow this rule:
-
-- Tokens are input
-- AST is owned data
-
-Once parsing is done, the tokeniser & tokens can be thrown away
 */

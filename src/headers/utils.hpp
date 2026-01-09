@@ -79,6 +79,7 @@ inline std::string tokenTypeToString( TokenType t )
 	}
 }
 
+// prints space character until correct indentation is met
 inline void indent( int n )
 {
 	for ( int i = 0; i < n; ++i ) {

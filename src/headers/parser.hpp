@@ -70,10 +70,10 @@ struct Stmt {
 struct VarDeclStmt : Stmt {
 	TokenType type;
 	std::string name;
-	std::unique_ptr<Expr> init;
+	std::unique_ptr<Expr> initExpr;
 
 	VarDeclStmt( TokenType tp, std::string nm, std::unique_ptr<Expr> i )
-		 : type( tp ), name( std::move( nm ) ), init( std::move( i ) )
+		 : type( tp ), name( std::move( nm ) ), initExpr( std::move( i ) )
 	{
 	}
 
@@ -89,11 +89,103 @@ struct VarDeclStmt : Stmt {
 		std::cout << "name: " << GREEN << name << CoRESET << "\n";
 
 		indent( indentLevel + 1 );
-		std::cout << "init:\n";
-		init->print( indentLevel + 2 );
+		std::cout << "initExpr:\n";
+		initExpr->print( indentLevel + 2 );
 	}
 };
 
+struct AssignStmt : Stmt {
+	std::string name;
+	std::unique_ptr<Expr> value;
+	AssignStmt( std::string nm, std::unique_ptr<Expr> val )
+		 : name( std::move( nm ) ), value( std::move( val ) )
+	{
+	}
+
+	void print( int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "AssignStmt\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "name: " << GREEN << name << CoRESET << "\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "value:\n";
+		value->print( indentLevel + 2 );
+	}
+};
+
+struct IfStmt : Stmt {
+	std::unique_ptr<Expr> condition;
+	std::unique_ptr<Stmt> thenBranch;
+	std::unique_ptr<Stmt> elseBranch;
+
+	IfStmt( std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> thenBr,
+			  std::unique_ptr<Stmt> elseBr = nullptr )
+		 : condition( std::move( cond ) ), thenBranch( std::move( thenBr ) ),
+			elseBranch( std::move( elseBr ) )
+	{
+	}
+
+	void print( int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "IfStmt\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "condition:\n";
+		condition->print( indentLevel + 2 );
+
+		indent( indentLevel + 1 );
+		std::cout << "then:\n";
+		thenBranch->print( indentLevel + 2 );
+
+		if ( elseBranch ) {
+			indent( indentLevel + 1 );
+			std::cout << "else:" << '\n';
+			elseBranch->print( indentLevel + 2 );
+		}
+	}
+};
+
+struct BlockStmt : Stmt {
+	std::vector<std::unique_ptr<Stmt>> statements;
+
+	void print( int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "BlockStmt" << '\n';
+		for ( auto& st : statements ) {
+			st->print( indentLevel + 1 );
+		}
+	}
+};
+
+struct WhileStmt : Stmt {
+	std::unique_ptr<Expr> condition;
+	std::unique_ptr<Stmt> loopBody;
+
+	WhileStmt( std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> lpBody )
+		 : condition( std::move( cond ) ), loopBody( std::move( lpBody ) )
+
+	{
+	}
+
+	void print( int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "WHileLoopStmt:\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "condition:\n";
+		condition->print( indentLevel + 2 );
+
+		indent( indentLevel + 1 );
+		std::cout << "body:\n";
+		loopBody->print( indentLevel + 2 );
+	}
+};
 // # End of Global data
 
 class Parser {
@@ -113,7 +205,11 @@ class Parser {
 
 	// parsing
 	std::unique_ptr<Stmt> parseStatement();
+	std::unique_ptr<Stmt> parseBlock();
 	std::unique_ptr<Stmt> parseVarDecl();
+	std::unique_ptr<Stmt> parseAssignment();
+	std::unique_ptr<Stmt> parseIfStmt();
+	std::unique_ptr<Stmt> parseWhileStmt();
 
 	std::unique_ptr<Expr> parseExpression();
 	std::unique_ptr<Expr> parsePrimary();

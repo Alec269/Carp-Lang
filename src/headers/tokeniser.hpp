@@ -21,7 +21,7 @@ enum class TokenType	 // enum class is safer than enum & prvnts name collisions
 	T_else,
 	T_while,
 	T_return,
-	T_for,
+	// T_for,
 
 	// Ids and Litereals
 	T_identifier,
@@ -66,7 +66,7 @@ static const std::unordered_map<std::string, TokenType> g_keywords = {
 	{ "float", TokenType::T_float },	  { "double", TokenType::T_double },
 	{ "any", TokenType::T_any },		  { "if", TokenType::T_if },
 	{ "else", TokenType::T_else },	  { "while", TokenType::T_while },
-	{ "return", TokenType::T_return }, { "for", TokenType::T_for },
+	{ "return", TokenType::T_return }, //{ "for", TokenType::T_for },
 };
 
 // where token appears

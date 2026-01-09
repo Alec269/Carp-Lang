@@ -1,0 +1,15 @@
+{
+   "recommendations": [
+      "alec269.styled-comments",
+      "alec269.cmake-output-colouriser",
+      "alec269.c-cpp-project-creator",
+      "kylinideteam.cmake-intellisence",
+      "ms-vscode.cmake-tools",
+      "streetsidesoftware.code-spell-checker",
+      "vadimcn.vscode-lldb",
+      "editorconfig.editorconfig",
+      "davidanson.vscode-markdownlint",
+      "pkief.material-icon-theme",
+      "zhuangtongfa.material-theme"
+   ]
+}

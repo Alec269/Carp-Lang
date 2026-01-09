@@ -13,12 +13,15 @@
       "Allman",
       "buildsystems",
       "Codegen",
+      "Indev",
       "janky",
       "LASTEXITCODE",
       "msvc",
       "MSVC",
+      "numlit",
       "operatr",
       "prvnts",
+      "strlit",
       "vcpkg"
    ],
    "debug.enableStatusBarColor": false,
@@ -29,5 +32,6 @@
    "clangd.arguments": [
       "--compile-commands-dir=out/build/VsNinja"
    ],
-   "files.eol": "\r\n"
+   "files.eol": "\r\n",
+   "workbench.colorTheme": "One Dark Pro Darker",
 }

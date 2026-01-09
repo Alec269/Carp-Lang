@@ -3,3 +3,18 @@ int x = 5;
 /* long y = 10; */
 float z = 3;
 string msg = "hello world";
+
+
+if (x) {
+   string msg = "value is five";
+   msg = "jj";
+}
+
+
+while (x) {
+   msg = "mono sodium glutamate";
+   if (x) {
+      int v = 6;
+   }
+}
+

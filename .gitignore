@@ -91,3 +91,6 @@ Thumbs.db
 *.metaproj
 *.meta
 *.binlog
+
+
+/external/llvm-21.1.8/*

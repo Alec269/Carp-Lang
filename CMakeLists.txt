@@ -17,8 +17,38 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #set(CMAKE_CXX_MODULE_STD ON)            #keep commented for visual studio
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# ===== LLVM minimal build config =====
+set(LLVM_TARGETS_TO_BUILD "X86" CACHE STRING "" FORCE)
+
+set(LLVM_ENABLE_TERMINFO OFF CACHE BOOL "" FORCE)
+set(LLVM_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
+set(LLVM_ENABLE_ZSTD OFF CACHE BOOL "" FORCE)
+
+set(LLVM_INCLUDE_TESTS OFF CACHE BOOL "" FORCE)
+set(LLVM_INCLUDE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(LLVM_INCLUDE_BENCHMARKS OFF CACHE BOOL "" FORCE)
+
+set(LLVM_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(LLVM_BUILD_UTILS OFF CACHE BOOL "" FORCE)
+
+# set(LLVM_ENABLE_PROJECTS "lld" CACHE STRING "" FORCE)
+
+
+
+# add_subdirectory(external/llvm-21.1.8/llvm EXCLUDE_FROM_ALL)
+
+# llvm_map_components_to_libnames(LLVM_LIBS
+#     core
+#     support
+#     irreader
+#     target
+#     x86
+# )
+
 # Add executable
 add_executable(${PROJECT_NAME})
+
+# target_link_libraries(${PROJECT_NAME} PRIVATE ${LLVM_LIBS})
 
 
 target_sources(${PROJECT_NAME} PUBLIC
@@ -40,9 +70,9 @@ target_sources(${PROJECT_NAME} PUBLIC
 #     CXX_MODULE_STD ON
 # )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-)
+# target_include_directories(${PROJECT_NAME} PRIVATE
+#     ${CMAKE_SOURCE_DIR}/include
+# )
 
 set(ABS_BIN_DIR ${CMAKE_SOURCE_DIR}/out/build/bin)
 set_target_properties(${PROJECT_NAME} PROPERTIES
