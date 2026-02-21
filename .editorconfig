@@ -22,3 +22,6 @@ indent_size = 3
 
 [*.md]
 trim_trailing_whitespace = false
+
+[*.{gitignore,gitattributes}]
+end_of_line = lf

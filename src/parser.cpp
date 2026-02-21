@@ -43,7 +43,8 @@ std::unique_ptr<Expr> Parser::parsePrimary()
 		return std::make_unique<NumberExpr>( m_tokens[ m_pos - 1 ].value );
 		// Create a NumberExpr AST node using the value of the previously consumed token
 		// basically NumberExpr("5") from int x = 5 ;
-		// m_pos - 1 refers to the token that was just consumed by match()
+		// syntactically, it allocates memory for a object of type NumberExpr and returns it
+		// with that value  // m_pos - 1 refers to the token that was just consumed by match()
 	}
 	if ( match( TokenType::T_identifier ) ) {
 		return std::make_unique<IdentExpr>( m_tokens[ m_pos - 1 ].value );

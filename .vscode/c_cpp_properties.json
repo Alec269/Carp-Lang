@@ -16,7 +16,8 @@
          "cStandard": "c17",
          "cppStandard": "c++23",
          "intelliSenseMode": "${default}",
-         "configurationProvider": "ms-vscode.cmake-tools"
+         "configurationProvider": "ms-vscode.cmake-tools",
+         "compileCommands": "out\\build\\VsNinja\\compile_commands.json"
       }
    ],
    "version": 4

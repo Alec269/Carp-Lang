@@ -1,73 +1,53 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.31)
 
-## Enable experimental import std FIRST
-#set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD          #keep commented for visual studio
-#    d0edc3af-4c50-42ea-a356-e2862fe7a444
-#)
-
-# Now declare the project (this detects the compiler)
-project(CarpLang VERSION 0.0.15 LANGUAGES CXX)
+project("CarpLang" VERSION 0.0.15 LANGUAGES CXX)
 
 # C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# 4️⃣ Enable import std (NOW it exists)
-#set(CMAKE_CXX_MODULE_STD ON)            #keep commented for visual studio
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# ===== LLVM minimal build config =====
-set(LLVM_TARGETS_TO_BUILD "X86" CACHE STRING "" FORCE)
+find_package(LLVM REQUIRED CONFIG)
 
-set(LLVM_ENABLE_TERMINFO OFF CACHE BOOL "" FORCE)
-set(LLVM_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
-set(LLVM_ENABLE_ZSTD OFF CACHE BOOL "" FORCE)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "LLVM dir: ${LLVM_DIR}")
 
-set(LLVM_INCLUDE_TESTS OFF CACHE BOOL "" FORCE)
-set(LLVM_INCLUDE_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(LLVM_INCLUDE_BENCHMARKS OFF CACHE BOOL "" FORCE)
+llvm_map_components_to_libnames(LLVM_LIBS
+    Core
+    Support
+    IRReader
+    X86CodeGen
+)
 
-set(LLVM_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
-set(LLVM_BUILD_UTILS OFF CACHE BOOL "" FORCE)
-
-# set(LLVM_ENABLE_PROJECTS "lld" CACHE STRING "" FORCE)
-
-
-
-# add_subdirectory(external/llvm-21.1.8/llvm EXCLUDE_FROM_ALL)
-
-# llvm_map_components_to_libnames(LLVM_LIBS
-#     core
-#     support
-#     irreader
-#     target
-#     x86
-# )
-
-# Add executable
 add_executable(${PROJECT_NAME})
-
-# target_link_libraries(${PROJECT_NAME} PRIVATE ${LLVM_LIBS})
-
 
 target_sources(${PROJECT_NAME} PUBLIC
     src/main.cpp
-    src/tokeniser.cpp
     src/parser.cpp
-    src/headers/tokeniser.hpp
+    src/SemanticAnalyser.cpp
+    src/tokeniser.cpp
+
     src/headers/parser.hpp
+    src/headers/SemanticAnalyser.hpp
+    src/headers/tokeniser.hpp
+    src/headers/utils.hpp
+
 )
+
+target_include_directories(${PROJECT_NAME}
+    SYSTEM PRIVATE
+    ${LLVM_INCLUDE_DIRS}
+) # Marking them SYSTEM suppresses LLVM’s internal warnings from polluting the build when using /W4.
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${LLVM_DEFINITIONS})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LLVM_LIBS})
 
 # C++ Modules MUST go in a FILE_SET
 # target_sources(${PROJECT_NAME} PRIVATE
 #     FILE_SET CXX_MODULES FILES
 #     src/tokeniser.ixx
-# )
-
-# # Enable import std
-# set_target_properties(${PROJECT_NAME} PROPERTIES
-#     CXX_MODULE_STD ON
 # )
 
 # target_include_directories(${PROJECT_NAME} PRIVATE

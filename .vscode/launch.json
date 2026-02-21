@@ -1,9 +1,21 @@
 {
    "configurations": [
       {
+         "name": "(Windows) Launch",
+         "type": "cppdbg",
+         "request": "launch",
+         "program": "${workspaceFolder}/out/build/bin/CarpLang.exe",
+         "args": [
+            "${workspaceFolder}/out/build/bin/CarpLang.exe"
+         ],
+         "stopAtEntry": false,
+         "cwd": "${workspaceFolder}",
+         "environment": [],
+      },
+      {
          "type": "lldb",
          "request": "launch",
-         "name": "Launch",
+         "name": "lldb",
          "program": "${workspaceFolder}/out/build/bin/CarpLang.exe",
          // "program": "${workspaceFolder}/out/build/bin/Debug/CarpLang.exe",
          "args": [

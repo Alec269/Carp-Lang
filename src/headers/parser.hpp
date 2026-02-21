@@ -70,10 +70,10 @@ struct Stmt {
 struct VarDeclStmt : Stmt {
 	TokenType type;
 	std::string name;
-	std::unique_ptr<Expr> initExpr;
+	std::unique_ptr<Expr> expr;
 
 	VarDeclStmt( TokenType tp, std::string nm, std::unique_ptr<Expr> i )
-		 : type( tp ), name( std::move( nm ) ), initExpr( std::move( i ) )
+		 : type( tp ), name( std::move( nm ) ), expr( std::move( i ) )
 	{
 	}
 
@@ -90,7 +90,7 @@ struct VarDeclStmt : Stmt {
 
 		indent( indentLevel + 1 );
 		std::cout << "initExpr:\n";
-		initExpr->print( indentLevel + 2 );
+		expr->print( indentLevel + 2 );
 	}
 };
 

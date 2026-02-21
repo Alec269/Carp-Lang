@@ -1,8 +1,9 @@
 // variable declarations
 int x = 5;
 /* long y = 10; */
-float z = 3;
+//float z = 3;
 string msg = "hello world";
+//string msg = "hello world";
 
 
 if (x) {

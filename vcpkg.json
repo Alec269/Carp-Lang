@@ -1,9 +1,7 @@
 {
-  "name": "carp-lang",
-  "version": "1.0.0",
-  "description": "A crap-comp project using vcpkg for dependency management generated with C/C++ Project Creator extension",
-  "builtin-baseline": "af752f21c9d79ba3df9cb0250ce2233933f58486",
-  "dependencies": [
-    "llvm"
-  ]
+   "name": "carp-lang",
+   "version": "1.0.0",
+   "description": "A crap-comp project using vcpkg for dependency management generated with C/C++ Project Creator extension",
+   "builtin-baseline": "af752f21c9d79ba3df9cb0250ce2233933f58486",
+   "dependencies": []
 }

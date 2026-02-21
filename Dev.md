@@ -14,7 +14,7 @@
 
 ```
 
-## What a tokeniser does
+## Tokeniser
 
 It takes source code:
 
@@ -28,19 +28,19 @@ And turns it into tokens:
 [T_int] [T_identifier(x)] [T_eq] [T_numLit(5)] [T_semi]
 ```
 
-## What a parser actually does
+## Parser
 
-A parser takes this:
+A parser takes this (*tokens*):
 
 `int x = 5;`
 
-Tokens:
+**Tokens**:
 
 ```cs
 [T_int] [T_identifier(x)] [T_eq] [T_numLit(5)] [T_semi]
 ```
 
-And turns it into structure:
+And turns it into a **structure**:
 
 ```sh
 VariableDeclaration
@@ -50,7 +50,7 @@ VariableDeclaration
       NumberLiteral(5)
 ```
 
-That structured representation is the AST.
+That *structured representation* is the **AST**.
 
 ## Why we need an AST
 
@@ -91,7 +91,7 @@ AST (what's needed)
 
 ---
 
-[v0.0.2-Indev]
+[v0.0.20-Indev]
 
 ```carp
 
@@ -201,4 +201,15 @@ WHileLoopStmt:
      StringExpr("mono sodium glutamate")
 ```
 
+## Semantic Analyser
 
+Semantic analysis answers questions like:
+
+- Is this variable used before it’s declared?
+- Is this variable declared twice in the same scope?
+- Is string assigned to an int?
+- Does if (x) make sense type-wise?
+- Does while ("hello") make sense?
+- Does inner var shadow outer var correctly?
+
+The Parser cannot do this — and should not.

@@ -5,12 +5,13 @@
 #include <print>
 #include <sstream>
 
+#include "headers/SemanticAnalyser.hpp"
 #include "headers/parser.hpp"
 #include "headers/tokeniser.hpp"
 
 int main( int argc, char* argv[] )
 {
-	if ( !( argc > 1 ) ) {
+	if ( argc <= 1 ) {
 		std::cout << "Please provide an input file" << '\n';
 		return -1;
 	}
@@ -36,10 +37,11 @@ int main( int argc, char* argv[] )
 	}
 
 	// @ Parser
+	std::vector<std::unique_ptr<Stmt>> nodes;
 	try {
 
-		Parser parser( tokens );		// pass tokens to the parser
-		auto nodes = parser.parse();	// start parsing and store in nodes
+		Parser parser( tokens );  // pass tokens to the parser
+		nodes = parser.parse();	  // start parsing and store in nodes
 
 		for ( const auto& stmt : nodes ) {
 			stmt->print();
@@ -48,6 +50,17 @@ int main( int argc, char* argv[] )
 	} catch ( const std::exception& err ) {
 
 		std::cerr << RED << "Parse Error: " << err.what() << CoRESET << "\n";
+	}
+
+	// @ Semantic analyser
+	try {
+
+		SemanticAnalyser semAnalyser;
+		semAnalyser.analyse( nodes );
+
+	} catch ( const std::exception& err ) {
+
+		std::cerr << RED << "Semantic Error: " << err.what() << CoRESET << "\n";
 	}
 
 	return 0;
