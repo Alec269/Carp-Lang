@@ -1,13 +1,222 @@
-// src\parser.cpp
+module;
 
-#include "headers/parser.hpp"
+#include <iostream>
 #include <memory>
+#include <string>
 #include <stdexcept>
-#include <utility>
 
-#include "headers/tokeniser.hpp"
+export module parser;
+//
+import tokeniser;
+import utils;
 
-/* --------------------------------------------------------------------------------------------- */
+// # Global Data
+
+// default expression type
+export struct Expr {
+	virtual ~Expr() = default;	 // DESTRUCTOR
+	// HELPER FOR PRINTING AST STRUCTURE
+	virtual void print( int indent = 0 ) const = 0;
+};
+
+export struct NumberExpr : Expr {
+	std::string value;
+	explicit NumberExpr( std::string val ) : value( std::move( val ) ) {}
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "NumberExpr(" << YELLOW << value << CoRESET << ")\n";
+	}
+};
+
+export struct StringExpr : Expr {
+	std::string value;
+	explicit StringExpr( std::string val ) : value( std::move( val ) ) {}
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "StringExpr(\"" << YELLOW << value << CoRESET << "\")\n";
+	}
+};
+
+export struct IdentExpr : Expr {
+	std::string name;
+	explicit IdentExpr( std::string nm ) : name( std::move( nm ) ) {}
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "IdentExpr(" << YELLOW << name << CoRESET << ")\n";
+	}
+};
+
+// == != >= <= etc
+export struct BinaryExpr : Expr {
+	std::unique_ptr<Expr> left;
+	std::unique_ptr<Expr> right;
+	TokenType operatr;
+
+	BinaryExpr( std::unique_ptr<Expr> lf, const TokenType op, std::unique_ptr<Expr> rt )
+		 : left( std::move( lf ) ), right( std::move( rt ) ), operatr( op )
+	{
+	}
+};
+
+export struct Stmt {
+	virtual ~Stmt() = default;
+	virtual void print( int indent = 0 ) const = 0;
+};
+
+// for variable declaration
+export struct VarDeclStmt : Stmt {
+	TokenType type;
+	std::string name;
+	std::unique_ptr<Expr> expr;
+
+	VarDeclStmt( const TokenType tp, std::string nm, std::unique_ptr<Expr> i )
+		 : type( tp ), name( std::move( nm ) ), expr( std::move( i ) )
+	{
+	}
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "VarDeclStmt\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "type: " << BLUE << tokenTypeToString( type ) << CoRESET << "\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "name: " << GREEN << name << CoRESET << "\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "initExpr:\n";
+		expr->print( indentLevel + 2 );
+	}
+};
+
+export struct AssignStmt : Stmt {
+	std::string name;
+	std::unique_ptr<Expr> value;
+	AssignStmt( std::string nm, std::unique_ptr<Expr> val )
+		 : name( std::move( nm ) ), value( std::move( val ) )
+	{
+	}
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "AssignStmt\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "name: " << GREEN << name << CoRESET << "\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "value:\n";
+		value->print( indentLevel + 2 );
+	}
+};
+
+export struct IfStmt : Stmt {
+	std::unique_ptr<Expr> condition;
+	std::unique_ptr<Stmt> thenBranch;
+	std::unique_ptr<Stmt> elseBranch;
+
+	IfStmt( std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> thenBr,
+			  std::unique_ptr<Stmt> elseBr = nullptr )
+		 : condition( std::move( cond ) ), thenBranch( std::move( thenBr ) ),
+			elseBranch( std::move( elseBr ) )
+	{
+	}
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "IfStmt\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "condition:\n";
+		condition->print( indentLevel + 2 );
+
+		indent( indentLevel + 1 );
+		std::cout << "then:\n";
+		thenBranch->print( indentLevel + 2 );
+
+		if ( elseBranch ) {
+			indent( indentLevel + 1 );
+			std::cout << "else:" << '\n';
+			elseBranch->print( indentLevel + 2 );
+		}
+	}
+};
+
+export struct BlockStmt : Stmt {
+	std::vector<std::unique_ptr<Stmt>> statements;
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "BlockStmt" << '\n';
+		for ( auto& st : statements ) {
+			st->print( indentLevel + 1 );
+		}
+	}
+};
+
+export struct WhileStmt : Stmt {
+	std::unique_ptr<Expr> condition;
+	std::unique_ptr<Stmt> loopBody;
+
+	WhileStmt( std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> lpBody )
+		 : condition( std::move( cond ) ), loopBody( std::move( lpBody ) )
+
+	{
+	}
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "WHileLoopStmt:\n";
+
+		indent( indentLevel + 1 );
+		std::cout << "condition:\n";
+		condition->print( indentLevel + 2 );
+
+		indent( indentLevel + 1 );
+		std::cout << "body:\n";
+		loopBody->print( indentLevel + 2 );
+	}
+};
+// # End of Global data
+
+export class Parser {
+ public:
+	explicit Parser( const std::vector<Token>& tokens );
+	std::vector<std::unique_ptr<Stmt>> parse();
+
+ private:
+	const std::vector<Token>& m_tokens;
+	size_t m_pos = 0;
+
+	// helpers
+	[[nodiscard]] const Token& peek() const;
+	const Token& advance();
+	bool match( TokenType type );
+	const Token& expect( TokenType type, const char* msg );
+
+	// parsing
+	std::unique_ptr<Stmt> parseStatement();
+	std::unique_ptr<Stmt> parseBlock();
+	std::unique_ptr<Stmt> parseVarDecl();
+	std::unique_ptr<Stmt> parseAssignment();
+	std::unique_ptr<Stmt> parseIfStmt();
+	std::unique_ptr<Stmt> parseWhileStmt();
+
+	std::unique_ptr<Expr> parseExpression();
+	std::unique_ptr<Expr> parsePrimary();
+};
 
 Parser::Parser( const std::vector<Token>& tokens ) : m_tokens( tokens ) {}
 
@@ -31,9 +240,6 @@ bool Parser::match( const TokenType type )
 	}
 	return false;
 }
-
-/* --------------------------------------------------------------------------------------------- */
-
 // to ensure the token is something we want like a name (x,y etc) after int/float/string
 const Token& Parser::expect( const TokenType type, const char* msg )
 {	// Ensures the current token is of the expected type.
@@ -46,8 +252,6 @@ const Token& Parser::expect( const TokenType type, const char* msg )
 	return advance();	 // if matches then go ahead
 }
 
-/* --------------------------------------------------------------------------------------------- */
-
 // primary expression(numlit ,id, strlit) skeleton
 std::unique_ptr<Expr> Parser::parsePrimary()
 {
@@ -55,7 +259,7 @@ std::unique_ptr<Expr> Parser::parsePrimary()
 		return std::make_unique<NumberExpr>( m_tokens[ m_pos - 1 ].value );
 		// Create a NumberExpr AST node using the value of the previously consumed token
 		// basically NumberExpr("5") from int x = 5 ;
-		// syntactically, it allocates memory for a object of type NumberExpr and returns it
+		// syntactically, it allocates memory for an object of type NumberExpr and returns it
 		// with that value  // m_pos - 1 refers to the token that was just consumed by match()
 	}
 	if ( match( TokenType::T_identifier ) ) {
@@ -64,89 +268,14 @@ std::unique_ptr<Expr> Parser::parsePrimary()
 	if ( match( TokenType::T_strLit ) ) {
 		return std::make_unique<StringExpr>( m_tokens[ m_pos - 1 ].value );
 	}
-	if ( match( TokenType::T_LBrack ) ) {
-		auto expr = parseExpression();
-		expect( TokenType::T_RBrack, "Expected ')'" );
-		return expr;
-	}
 
 	throw std::runtime_error( "Expected expression" );
 }
 
-/* --------------------------------------------------------------------------------------------- */
-
 std::unique_ptr<Expr> Parser::parseExpression()
 {
-	return parseEquality();	 // very limited definition for now
+	return parsePrimary();	// very limited definition for now
 }
-
-std::unique_ptr<Expr> Parser::parseComparison()
-{
-	auto expr = parseTerm();
-
-	while ( match( TokenType::T_GrT ) || match( TokenType::T_GrTEq ) || match( TokenType::T_LeT ) ||
-			  match( TokenType::T_LeTEq ) ) {
-		TokenType op = m_tokens[ m_pos - 1 ].type;
-		auto right = parseTerm();
-		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ) );
-	}
-	return expr;
-}
-
-std::unique_ptr<Expr> Parser::parseUnary()
-{
-	if ( match( TokenType::T_minus ) ) {
-		TokenType op = m_tokens[ m_pos - 1 ].type;
-		auto right = parseUnary();
-
-		// Treat unary minus as binary (0 - expr) ; [apparently works flawlessly]
-		auto zero = std::make_unique<NumberExpr>( "0" );
-		return std::make_unique<BinaryExpr>( std::move( zero ), op, std::move( right ) );
-	}
-	return parsePrimary();
-}
-// (* and /)
-std::unique_ptr<Expr> Parser::parseFactor()
-{
-	auto expr = parseUnary();
-
-	while ( match( TokenType::T_star ) || match( TokenType::T_slash ) ) {
-		TokenType op = m_tokens[ m_pos - 1 ].type;
-		auto right = parseUnary();
-		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ) );
-	}
-	return expr;
-}
-
-std::unique_ptr<Expr> Parser::parseEquality()
-{
-	auto expr = parseComparison();
-
-	while ( match( TokenType::T_eq ) || match( TokenType::T_NotE ) ) {
-		TokenType op = m_tokens[ m_pos - 1 ].type;
-		auto right = parseComparison();
-		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ) );
-	}
-	return expr;
-	// What this does:
-	// 	Parse left side
-	// 	While we see == or !=
-	// 	Keep building tree left-associatively
-}
-
-// (+ and -)
-std::unique_ptr<Expr> Parser::parseTerm()
-{
-	auto expr = parseFactor();
-	while ( match( TokenType::T_plus ) || match( TokenType::T_minus ) ) {
-		TokenType op = m_tokens[ m_pos - 1 ].type;
-		auto right = parseFactor();
-		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ) );
-	}
-	return expr;
-}
-
-/* --------------------------------------------------------------------------------------------- */
 
 std::unique_ptr<Stmt> Parser::parseVarDecl()
 {	// a var decl should start with a type - int/float/string
@@ -166,8 +295,6 @@ std::unique_ptr<Stmt> Parser::parseVarDecl()
 	return std::make_unique<VarDeclStmt>( type, nameToken.value, std::move( init ) );
 }
 
-/* --------------------------------------------------------------------------------------------- */
-
 std::unique_ptr<Stmt> Parser::parseAssignment()
 {
 	const Token& name = expect( TokenType::T_identifier, "Expected identifier" );
@@ -177,8 +304,6 @@ std::unique_ptr<Stmt> Parser::parseAssignment()
 
 	return std::make_unique<AssignStmt>( name.value, std::move( value ) );
 }
-
-/* --------------------------------------------------------------------------------------------- */
 
 std::unique_ptr<Stmt> Parser::parseIfStmt()
 {
@@ -203,8 +328,6 @@ std::unique_ptr<Stmt> Parser::parseIfStmt()
 												std::move( elseBranch ) );
 }
 
-/* --------------------------------------------------------------------------------------------- */
-
 std::unique_ptr<Stmt> Parser::parseWhileStmt()
 {
 	// consume if
@@ -219,8 +342,6 @@ std::unique_ptr<Stmt> Parser::parseWhileStmt()
 	return std::make_unique<WhileStmt>( std::move( condition ), std::move( whileBody ) );
 }
 
-/* --------------------------------------------------------------------------------------------- */
-
 std::unique_ptr<Stmt> Parser::parseBlock()
 {
 	expect( TokenType::T_LBrace, "Expected '{'" );
@@ -233,8 +354,6 @@ std::unique_ptr<Stmt> Parser::parseBlock()
 	expect( TokenType::T_RBrace, "Expected '}'" );
 	return block;
 }
-
-/* --------------------------------------------------------------------------------------------- */
 
 std::unique_ptr<Stmt> Parser::parseStatement()
 {
@@ -257,8 +376,6 @@ std::unique_ptr<Stmt> Parser::parseStatement()
 		throw std::runtime_error( "Unknown statement" );
 	}
 }
-
-/* --------------------------------------------------------------------------------------------- */
 
 std::vector<std::unique_ptr<Stmt>> Parser::parse()
 {

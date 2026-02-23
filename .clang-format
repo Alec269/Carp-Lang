@@ -1,26 +1,26 @@
 ---
 Language: Cpp
-BasedOnStyle: LLVM
+BasedOnStyle: Microsoft
 IndentWidth: 3
 TabWidth: 3
 UseTab: true
 ColumnLimit: 100
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterFunction: true
-  AfterClass: false
-  AfterStruct: false
-  AfterUnion: true
-  AfterNamespace: true
-  AfterEnum: true
+   AfterFunction: true
+   AfterClass: false
+   AfterStruct: false
+   AfterUnion: true
+   AfterNamespace: true
+   AfterEnum: true
 
-  # Keep conditionals attached
-  AfterControlStatement: false
+   # Keep conditionals attached
+   AfterControlStatement: false
 
-  AfterExternBlock: false
-  AfterObjCDeclaration: false
-  BeforeElse: false
-  BeforeCatch: false
+   AfterExternBlock: false
+   AfterObjCDeclaration: false
+   BeforeElse: false
+   BeforeCatch: false
 
 AllowShortIfStatementsOnASingleLine: false
 AllowShortBlocksOnASingleLine: Empty
@@ -44,19 +44,19 @@ Cpp11BracedListStyle: false
 DerivePointerAlignment: false
 DisableFormat: false
 ExperimentalAutoDetectBinPacking: false
-ForEachMacros: [ foreach, Q_FOREACH, BOOST_FOREACH ]
+ForEachMacros: [foreach, Q_FOREACH, BOOST_FOREACH]
 IncludeCategories:
-  - Regex: '^<.*.h>'
-    Priority: 1
-  - Regex: '^<.*'
-    Priority: 2
-  - Regex: '.*'
-    Priority: 3
+   - Regex: "^<.*.h>"
+     Priority: 1
+   - Regex: "^<.*"
+     Priority: 2
+   - Regex: ".*"
+     Priority: 3
 IndentCaseLabels: false
 IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: true
-MacroBlockBegin: ''
-MacroBlockEnd: ''
+MacroBlockBegin: ""
+MacroBlockEnd: ""
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
 ObjCBlockIndentWidth: 2

@@ -4,6 +4,7 @@ root = true
 charset = utf-8
 end_of_line = crlf
 insert_final_newline = true
+indent_size = 3
 trim_trailing_whitespace = true
 encoding = utf8
 spelling_languages = en-GB
@@ -22,6 +23,7 @@ indent_size = 3
 
 [*.md]
 trim_trailing_whitespace = false
+indent_size = 2
 
 [*.{gitignore,gitattributes}]
 end_of_line = lf

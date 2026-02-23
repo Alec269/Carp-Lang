@@ -1,93 +1,90 @@
 TokenType order : 0 | Textual: 'int' Pos: 2:1
-TokenType order : 12 | Textual: 'x' Pos: 2:5
-TokenType order : 19 | Textual: '=' Pos: 2:7
-TokenType order : 13 | Textual: '5' Pos: 2:9
-TokenType order : 20 | Textual: ';' Pos: 2:10
-TokenType order : 1 | Textual: 'long' Pos: 3:1
-TokenType order : 12 | Textual: 'y' Pos: 3:6
-TokenType order : 19 | Textual: '=' Pos: 3:8
-TokenType order : 13 | Textual: '10' Pos: 3:10
-TokenType order : 20 | Textual: ';' Pos: 3:12
-TokenType order : 4 | Textual: 'float' Pos: 4:1
-TokenType order : 12 | Textual: 'z' Pos: 4:7
-TokenType order : 19 | Textual: '=' Pos: 4:9
-TokenType order : 13 | Textual: '3' Pos: 4:11
-TokenType order : 20 | Textual: ';' Pos: 4:12
+TokenType order : 11 | Textual: 'x' Pos: 2:5
+TokenType order : 18 | Textual: '=' Pos: 2:7
+TokenType order : 12 | Textual: '5' Pos: 2:9
+TokenType order : 19 | Textual: ';' Pos: 2:10
 TokenType order : 3 | Textual: 'string' Pos: 5:1
-TokenType order : 12 | Textual: 'msg' Pos: 5:8
-TokenType order : 19 | Textual: '=' Pos: 5:12
-TokenType order : 14 | Textual: 'hello world' Pos: 5:14
-TokenType order : 20 | Textual: ';' Pos: 5:27
-TokenType order : 12 | Textual: 'foo' Pos: 8:1
-TokenType order : 12 | Textual: 'bar123' Pos: 9:1
-TokenType order : 12 | Textual: '_baz' Pos: 10:1
-TokenType order : 12 | Textual: 'x' Pos: 13:1
-TokenType order : 22 | Textual: '==' Pos: 13:3
-TokenType order : 12 | Textual: 'y' Pos: 13:6
-TokenType order : 20 | Textual: ';' Pos: 13:7
-TokenType order : 12 | Textual: 'x' Pos: 14:1
-TokenType order : 23 | Textual: '!=' Pos: 14:3
-TokenType order : 12 | Textual: 'z' Pos: 14:6
-TokenType order : 20 | Textual: ';' Pos: 14:7
-TokenType order : 12 | Textual: 'x' Pos: 15:1
-TokenType order : 26 | Textual: '<' Pos: 15:3
-TokenType order : 12 | Textual: 'y' Pos: 15:5
-TokenType order : 20 | Textual: ';' Pos: 15:6
-TokenType order : 12 | Textual: 'x' Pos: 16:1
-TokenType order : 27 | Textual: '<=' Pos: 16:3
-TokenType order : 12 | Textual: 'y' Pos: 16:6
-TokenType order : 20 | Textual: ';' Pos: 16:7
-TokenType order : 12 | Textual: 'x' Pos: 17:1
-TokenType order : 28 | Textual: '>' Pos: 17:3
-TokenType order : 12 | Textual: 'y' Pos: 17:5
-TokenType order : 20 | Textual: ';' Pos: 17:6
-TokenType order : 12 | Textual: 'x' Pos: 18:1
-TokenType order : 29 | Textual: '>=' Pos: 18:3
-TokenType order : 12 | Textual: 'y' Pos: 18:6
-TokenType order : 20 | Textual: ';' Pos: 18:7
-TokenType order : 30 | Textual: '(' Pos: 21:1
-TokenType order : 12 | Textual: 'x' Pos: 21:2
-TokenType order : 31 | Textual: ')' Pos: 21:3
-TokenType order : 20 | Textual: ';' Pos: 21:4
-TokenType order : 32 | Textual: '{' Pos: 22:1
-TokenType order : 12 | Textual: 'x' Pos: 22:3
-TokenType order : 20 | Textual: ';' Pos: 22:4
-TokenType order : 33 | Textual: '}' Pos: 22:6
-TokenType order : 34 | Textual: '[' Pos: 23:1
-TokenType order : 12 | Textual: 'y' Pos: 23:3
-TokenType order : 35 | Textual: ']' Pos: 23:5
-TokenType order : 20 | Textual: ';' Pos: 23:6
-TokenType order : 12 | Textual: 'foo' Pos: 26:1
-TokenType order : 21 | Textual: ',' Pos: 26:4
-TokenType order : 12 | Textual: 'bar' Pos: 26:6
-TokenType order : 21 | Textual: ',' Pos: 26:9
-TokenType order : 12 | Textual: 'baz' Pos: 26:11
-TokenType order : 20 | Textual: ';' Pos: 26:14
-TokenType order : 30 | Textual: '(' Pos: 29:1
-TokenType order : 31 | Textual: ')' Pos: 29:2
-TokenType order : 32 | Textual: '{' Pos: 30:1
-TokenType order : 33 | Textual: '}' Pos: 30:2
-TokenType order : 34 | Textual: '[' Pos: 31:1
-TokenType order : 35 | Textual: ']' Pos: 31:2
-TokenType order : 7 | Textual: 'if' Pos: 34:1
-TokenType order : 30 | Textual: '(' Pos: 34:4
-TokenType order : 12 | Textual: 'x' Pos: 34:5
-TokenType order : 22 | Textual: '==' Pos: 34:7
-TokenType order : 13 | Textual: '5' Pos: 34:10
-TokenType order : 31 | Textual: ')' Pos: 34:11
-TokenType order : 32 | Textual: '{' Pos: 34:13
-TokenType order : 12 | Textual: 'msg' Pos: 35:5
-TokenType order : 19 | Textual: '=' Pos: 35:9
-TokenType order : 14 | Textual: 'value is five' Pos: 35:11
-TokenType order : 20 | Textual: ';' Pos: 35:26
-TokenType order : 33 | Textual: '}' Pos: 36:1
-TokenType order : 11 | Textual: 'for' Pos: 38:1
-TokenType order : 30 | Textual: '(' Pos: 38:4
-TokenType order : 31 | Textual: ')' Pos: 38:5
-TokenType order : 32 | Textual: '{' Pos: 38:6
-TokenType order : 33 | Textual: '}' Pos: 38:7
-TokenType order : 20 | Textual: ';' Pos: 38:8
-TokenType order : 10 | Textual: 'return' Pos: 41:1
-TokenType order : 12 | Textual: 'x' Pos: 41:8
-TokenType order : 20 | Textual: ';' Pos: 41:9
-TokenType order : 36 | Textual: '' Pos: 43:1
+TokenType order : 11 | Textual: 'msg' Pos: 5:8
+TokenType order : 18 | Textual: '=' Pos: 5:12
+TokenType order : 13 | Textual: 'hello world' Pos: 5:14
+TokenType order : 19 | Textual: ';' Pos: 5:27
+TokenType order : 7 | Textual: 'if' Pos: 9:1
+TokenType order : 29 | Textual: '(' Pos: 9:4
+TokenType order : 11 | Textual: 'x' Pos: 9:5
+TokenType order : 30 | Textual: ')' Pos: 9:6
+TokenType order : 31 | Textual: '{' Pos: 9:8
+TokenType order : 3 | Textual: 'string' Pos: 10:4
+TokenType order : 11 | Textual: 'msg' Pos: 10:11
+TokenType order : 18 | Textual: '=' Pos: 10:15
+TokenType order : 13 | Textual: 'value is five' Pos: 10:17
+TokenType order : 19 | Textual: ';' Pos: 10:32
+TokenType order : 11 | Textual: 'msg' Pos: 11:4
+TokenType order : 18 | Textual: '=' Pos: 11:8
+TokenType order : 13 | Textual: 'jj' Pos: 11:10
+TokenType order : 19 | Textual: ';' Pos: 11:14
+TokenType order : 32 | Textual: '}' Pos: 12:1
+TokenType order : 9 | Textual: 'while' Pos: 15:1
+TokenType order : 29 | Textual: '(' Pos: 15:7
+TokenType order : 11 | Textual: 'x' Pos: 15:8
+TokenType order : 30 | Textual: ')' Pos: 15:9
+TokenType order : 31 | Textual: '{' Pos: 15:11
+TokenType order : 11 | Textual: 'msg' Pos: 16:4
+TokenType order : 18 | Textual: '=' Pos: 16:8
+TokenType order : 13 | Textual: 'mono sodium glutamate' Pos: 16:10
+TokenType order : 19 | Textual: ';' Pos: 16:33
+TokenType order : 7 | Textual: 'if' Pos: 17:4
+TokenType order : 29 | Textual: '(' Pos: 17:7
+TokenType order : 11 | Textual: 'x' Pos: 17:8
+TokenType order : 30 | Textual: ')' Pos: 17:9
+TokenType order : 31 | Textual: '{' Pos: 17:11
+TokenType order : 0 | Textual: 'int' Pos: 18:7
+TokenType order : 11 | Textual: 'v' Pos: 18:11
+TokenType order : 18 | Textual: '=' Pos: 18:13
+TokenType order : 12 | Textual: '6' Pos: 18:15
+TokenType order : 19 | Textual: ';' Pos: 18:16
+TokenType order : 32 | Textual: '}' Pos: 19:4
+TokenType order : 32 | Textual: '}' Pos: 20:1
+TokenType order : 35 | Textual: '' Pos: 22:1
+VarDeclStmt
+ type: int
+ name: x
+ initExpr:
+  NumberExpr(5)
+VarDeclStmt
+ type: string
+ name: msg
+ initExpr:
+  StringExpr("hello world")
+IfStmt
+ condition:
+  IdentExpr(x)
+ then:
+  BlockStmt
+   VarDeclStmt
+    type: string
+    name: msg
+    initExpr:
+     StringExpr("value is five")
+   AssignStmt
+    name: msg
+    value:
+     StringExpr("jj")
+WHileLoopStmt:
+ condition:
+  IdentExpr(x)
+ body:
+  BlockStmt
+   AssignStmt
+    name: msg
+    value:
+     StringExpr("mono sodium glutamate")
+   IfStmt
+    condition:
+     IdentExpr(x)
+    then:
+     BlockStmt
+      VarDeclStmt
+       type: int
+       name: v
+       initExpr:
+        NumberExpr(6)

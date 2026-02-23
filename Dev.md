@@ -117,7 +117,7 @@ while (x) {
 
 ```
 
-Indev Compiler output:
+#### In-dev Compiler output:
 
 ```sh
 TokenType order : 0 | Textual: 'int' Pos: 2:1
@@ -213,3 +213,24 @@ Semantic analysis answers questions like:
 - Does inner var shadow outer var correctly?
 
 The Parser cannot do this — and should not.
+
+## Features to add
+
+- Method to print/output to stdout
+- Runtime scope-stack
+- More Types
+  - float
+  - double
+  - bool
+  - char
+- Functions
+- Implement in interpreter:
+  - `*`
+  - `/`
+  - `==`
+  - `!=`
+  - `<`
+  - `<=`
+  - `>`
+  - `>=` 
+- 

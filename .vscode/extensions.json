@@ -10,6 +10,7 @@
       "editorconfig.editorconfig",
       "davidanson.vscode-markdownlint",
       "pkief.material-icon-theme",
-      "zhuangtongfa.material-theme"
+      "zhuangtongfa.material-theme",
+      "llvm-vs-code-extensions.vscode-clangd"
    ]
 }

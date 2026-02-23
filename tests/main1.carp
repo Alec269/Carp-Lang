@@ -32,7 +32,7 @@ foo, bar, baz;
 
 // mixed
 if (x == 5) {
-    msg = "value is five";
+   msg = "value is five";
 }
 
 for(){};

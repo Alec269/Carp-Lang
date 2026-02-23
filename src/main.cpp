@@ -1,13 +1,17 @@
-// Carp lang main
+// Carp lang src\main.cpp
 
 #include <fstream>
 #include <iostream>
-#include <print>
 #include <sstream>
 
 #include "headers/SemanticAnalyser.hpp"
 #include "headers/parser.hpp"
 #include "headers/tokeniser.hpp"
+
+// import tokeniser;
+// import parser;
+// import SemanticAnalyser; // doesn't work
+// import utils;
 
 int main( int argc, char* argv[] )
 {
@@ -30,10 +34,10 @@ int main( int argc, char* argv[] )
 	auto tokens = tokeniser.tokenise();	  // get the returned tokens from the tokeniser
 
 	// # Token output for debugging
-	for ( const auto& t : tokens ) {
-		std::cout << "TokenType order : " << static_cast<int>( t.type ) << " | Textual: '" << MAGENTA
-					 << t.value << CoRESET << "' " << "Pos: " << GREEN << t.loc.line << ":"
-					 << t.loc.column << CoRESET << '\n';
+	for ( const auto& [ type, value, loc ] : tokens ) {
+		std::cout << "TokenType order : " << static_cast<int>( type ) << " | Textual: '" << MAGENTA
+					 << value << CoRESET << "' " << "Pos: " << GREEN << loc.line << ":" << loc.column
+					 << CoRESET << '\n';
 	}
 
 	// @ Parser
@@ -51,13 +55,11 @@ int main( int argc, char* argv[] )
 
 		std::cerr << RED << "Parse Error: " << err.what() << CoRESET << "\n";
 	}
-
+	// hello
 	// @ Semantic analyser
 	try {
-
 		SemanticAnalyser semAnalyser;
 		semAnalyser.analyse( nodes );
-
 	} catch ( const std::exception& err ) {
 
 		std::cerr << RED << "Semantic Error: " << err.what() << CoRESET << "\n";

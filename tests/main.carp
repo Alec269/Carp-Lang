@@ -19,3 +19,8 @@ while (x) {
    }
 }
 
+x = 5 + 3 * 2;
+int y = (5 + 3) * 2;
+int z = x + y * 4;
+int m = x + y * 4 / 6;
+

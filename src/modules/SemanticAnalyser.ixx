@@ -1,25 +1,68 @@
-// src\SemanticAnalyser.cpp
-#include "headers/SemanticAnalyser.hpp"
-#include <stdexcept>
-#include "headers/parser.hpp"
-#include "headers/tokeniser.hpp"
+module;
 
-/* --------------------------------------------------------------------------------------------- */
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+export module SemanticAnalyser;
+
+import tokeniser;
+import parser;
+
+// enum class TokenType;
+
+// to store info about a var
+export struct Symbol {
+	TokenType tType;	// currently we only have its type
+};
+
+// everything within a {} - multiple can exist in one file
+
+export struct Scope {
+	std::unordered_map<std::string, Symbol> symbols;
+	/* This map says:
+	"x"   → Symbol{ int }
+	"msg" → Symbol{ string }
+	*/
+};
+
+export  class SemanticAnalyser {
+ public:
+	SemanticAnalyser();
+	void analyse( const std::vector<std::unique_ptr<Stmt>>& program );
+
+ private:
+	std::vector<Scope> scopeStack;  // to keep track of all the scopes in order
+
+	/* example stack
+	global scope
+		└─ if scope
+			└─ while scope
+	*/
+//
+	void enterScope();
+	void exitScope();
+
+	void visitStmt( const Stmt* stmt );
+	TokenType visitExpr( const Expr* expr );
+
+	void declare( const std::string& name, TokenType type );
+	Symbol* lookup( const std::string& name );
+};
 
 SemanticAnalyser::SemanticAnalyser() = default;
 
 void SemanticAnalyser::enterScope()
 {
-	scopeStack.emplace_back();	 // add new empty scope object in scope vector
-	// we fill it when we reach "stmts", in stmt funcs like declare within visitStmt()
+	scopeStack.push_back( {} );  // add new empty scope object in scope vector
 }
 
 void SemanticAnalyser::exitScope()
 {
 	scopeStack.pop_back();	// remove the last element [meaning exit]
 }
-
-/* --------------------------------------------------------------------------------------------- */
 
 // returns a pointer to the Symbol of an identifier, if that id exists in any active scope.
 Symbol* SemanticAnalyser::lookup( const std::string& name )
@@ -39,8 +82,6 @@ Symbol* SemanticAnalyser::lookup( const std::string& name )
 	// rbegin() = Give me an iterator that starts at the LAST element
 	// rend() = starts before first
 }
-
-/* --------------------------------------------------------------------------------------------- */
 
 // to keep track of declarations
 void SemanticAnalyser::declare( const std::string& name, const TokenType type )
@@ -64,12 +105,10 @@ void SemanticAnalyser::declare( const std::string& name, const TokenType type )
 	*/
 }
 
-/* --------------------------------------------------------------------------------------------- */
-
-// answers: What type does this expression evaluate to?
+// for getting expr
 TokenType SemanticAnalyser::visitExpr( const Expr* expr )
 {
-	if ( auto num = dynamic_cast<const NumberExpr*>( expr ) ) {
+	if ( dynamic_cast<const NumberExpr*>( expr ) ) {
 		return TokenType::T_int;
 	}
 	/*	What dynamic_cast does
@@ -88,67 +127,54 @@ TokenType SemanticAnalyser::visitExpr( const Expr* expr )
 					- Tests num != nullptr
 	*/
 	if ( const auto id = dynamic_cast<const IdentExpr*>( expr ) ) {  // if it has id
-		const Symbol* sym = lookup( id->name );							  // check the entire scope-stack
-		// ↑ get id [Pointer lets you express absence (nullptr)]
+		const Symbol* sym =
+			 lookup( id->name );	 // get id [Pointer lets you express absence (nullptr)]
 		if ( !sym ) {
 			throw std::runtime_error( "Use of undeclared variable: " + id->name );
 		}
 		return sym->tType;
-		// basically, if identifier(symbol) exists return its type
 	}
 
-	if ( auto str = dynamic_cast<const StringExpr*>( expr ) ) {
+	if ( dynamic_cast<const StringExpr*>( expr ) ) {
 		return TokenType::T_string;
-	}
-
-	if ( const auto bin = dynamic_cast<const BinaryExpr*>( expr ) ) {
-		const TokenType leftType = visitExpr( bin->left.get() );
-		const TokenType rightType = visitExpr( bin->right.get() );
-		// ↑ recursively ask what type, the stuff on both side is | (x+3)
-
-		if ( leftType != rightType ) {
-			throw std::runtime_error( "Type mismatch in binary expression" );
-		}	// if types matches just return type of one
-		return leftType;
 	}
 
 	throw std::runtime_error( "Unknown expression type" );
 }
-/* --------------------------------------------------------------------------------------------- */
-// This is a dispatcher that walks the AST and enforces semantic rules.
-//  Semantics = meaning.
 
 void SemanticAnalyser::visitStmt( const Stmt* stmt )
 {
-	// # declaration
-	//  here it tries to cast, if it passes then we know it is varDecl. if not then ship to next 'if'
+	// declaration
+	// here it tries to cast, if it passes then we know it is varDecl. if not then ship to next 'if'
 	if ( const auto v = dynamic_cast<const VarDeclStmt*>( stmt ) ) {
+		// ReSharper disable once CppTooWideScopeInitStatement
 		const TokenType exprType = visitExpr( v->expr.get() );  // visitExpr returns a TokenType
 		// get the expr type (like intLit/strLit etc) and compare
 		if ( exprType != v->type ) {	// here v->type is the type decl like int,string,float
 			throw std::runtime_error( "Type mismatch in declaration of " + v->name );
 		}
-		declare( v->name, v->type );	// this stores it in current scope within scope-stack
+
+		declare( v->name, v->type );
 		return;
 	}
-	// # assignment
+	// assignment
 	if ( const auto a = dynamic_cast<const AssignStmt*>( stmt ) ) {
 		const Symbol* sym = lookup( a->name );	 // check if id exists or not
 		if ( !sym ) {
 			throw std::runtime_error( "Assignment to undeclared variable: " + a->name );
 		}
+		// ReSharper disable once CppTooWideScopeInitStatement
 		const TokenType valueType = visitExpr( a->value.get() );	 // get the expr
 		if ( valueType != sym->tType ) {
 			throw std::runtime_error( "Type mismatch in assignment to " + a->name );
 		}
 		return;
 	}
-	// # blocks
+	// blocks
 	if ( const auto b = dynamic_cast<const BlockStmt*>( stmt ) ) {
 		enterScope();
 		for ( auto& st : b->statements ) {
-			visitStmt( st.get() );	// recursively check the inner stmts
-
+			visitStmt( st.get() );
 			// What .get() does
 			// Returns the raw pointer inside unique_ptr.
 			// Ownership does not change.
@@ -158,10 +184,7 @@ void SemanticAnalyser::visitStmt( const Stmt* stmt )
 	}
 	// if
 	if ( const auto i = dynamic_cast<const IfStmt*>( stmt ) ) {
-		const auto condType = visitExpr( i->condition.get() );
-		if ( condType != TokenType::T_int ) {
-			throw std::runtime_error( "condition expression must evaluate to int" );
-		}
+		visitExpr( i->condition.get() );
 		visitStmt( i->thenBranch.get() );
 		if ( i->elseBranch ) {
 			visitStmt( i->elseBranch.get() );
@@ -170,17 +193,12 @@ void SemanticAnalyser::visitStmt( const Stmt* stmt )
 	}
 	// while
 	if ( const auto w = dynamic_cast<const WhileStmt*>( stmt ) ) {
-		const auto condType = visitExpr( w->condition.get() );
-		if ( condType != TokenType::T_int ) {
-			throw std::runtime_error( "condition expression must evaluate to int" );
-		}
+		visitExpr( w->condition.get() );
 		visitStmt( w->loopBody.get() );
 		return;
 	}
 	throw std::runtime_error( "Unknown Statement type" );
 }
-
-/* --------------------------------------------------------------------------------------------- */
 
 void SemanticAnalyser::analyse( const std::vector<std::unique_ptr<Stmt>>& program )
 {

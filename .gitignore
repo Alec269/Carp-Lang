@@ -95,3 +95,4 @@ Thumbs.db
 
 /external/llvm-21.1.8/*
 msg.txt
+/cmake-build-debug/

@@ -1,19 +1,21 @@
-// src\headers\utils.hpp
-#pragma once
+module;
 
+#include <iostream>
 #include <string>
 
-#include "tokeniser.hpp"
+export module utils;
+
+import tokeniser;
 
 // define colour codes for easy printing
-const std::string RED = "\033[31m";
-const std::string GREEN = "\033[32m";
-const std::string BLUE = "\033[34m";
-const std::string YELLOW = "\033[33m";
-const std::string MAGENTA = "\033[35m";
-const std::string CoRESET = "\033[0m";	 // Reset to default color
+export const std::string RED = "\033[31m";
+export const std::string GREEN = "\033[32m";
+export const std::string BLUE = "\033[34m";
+export const std::string YELLOW = "\033[33m";
+export const std::string MAGENTA = "\033[35m";
+export const std::string CoRESET = "\033[0m";  // Reset to default colour
 
-inline std::string tokenTypeToString( TokenType t )
+export std::string tokenTypeToString( const TokenType t )
 {
 	switch ( t ) {
 	case TokenType::T_int:
@@ -81,9 +83,10 @@ inline std::string tokenTypeToString( TokenType t )
 }
 
 // prints space character until correct indentation is met
-inline void indent( int n )
+export void indent( const int n )
 {
 	for ( int i = 0; i < n; ++i ) {
 		std::cout << " ";
 	}
 }
+//

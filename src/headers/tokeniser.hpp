@@ -1,3 +1,4 @@
+// src\headers\tokeniser.hpp
 #pragma once
 
 #include <string>
@@ -66,7 +67,7 @@ static const std::unordered_map<std::string, TokenType> g_keywords = {
 	{ "float", TokenType::T_float },	  { "double", TokenType::T_double },
 	{ "any", TokenType::T_any },		  { "if", TokenType::T_if },
 	{ "else", TokenType::T_else },	  { "while", TokenType::T_while },
-	{ "return", TokenType::T_return }, //{ "for", TokenType::T_for },
+	{ "return", TokenType::T_return },	//{ "for", TokenType::T_for },
 };
 
 // where token appears
@@ -94,12 +95,11 @@ class Tokeniser {
 
  private:
 	// private helper funcs
-	char peek() const;  // looks at current char
+	[[nodiscard]] char peek() const;  // looks at current char
 	char advance();	  // consumes current char(moves forward)
 	void addToken( TokenType tType, std::string value = "", size_t startColumn = 1 );
 	// stores a token
 
- private:
 	// member vars
 	std::string m_source;			// entire input file
 	size_t m_index = 0;				// current position in the string

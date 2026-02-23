@@ -1,3 +1,4 @@
+// src\headers\SemanticAnalyser.hpp
 #pragma once
 
 #include <unordered_map>
@@ -6,7 +7,7 @@
 
 // to store info about a var
 struct Symbol {
-	TokenType tType;	// currently we only have it's type
+	TokenType tType;	// currently we only have its type
 };
 
 // everything within a {} - multiple can exist in one file
@@ -32,7 +33,6 @@ class SemanticAnalyser {
 		└─ if scope
 			└─ while scope
 	*/
-
 
 	void enterScope();
 	void exitScope();

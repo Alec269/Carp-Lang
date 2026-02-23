@@ -1,13 +1,23 @@
+// src\headers\parser.hpp
 #pragma once
 
 #include <iostream>
 #include <memory>
 #include <string>
+#include <variant>
 
 #include "tokeniser.hpp"
 #include "utils.hpp"
 
-// # Global Data
+/* --------------------------------------------------------------------------------------------- */
+
+using Value = std::variant<int, std::string>;
+
+struct Environment {
+	std::unordered_map<std::string, Value> variables;
+};
+
+/* --------------------------------------------------------------------------------------------- */
 
 // default expression type
 struct Expr {
@@ -18,9 +28,9 @@ struct Expr {
 
 struct NumberExpr : Expr {
 	std::string value;
-	NumberExpr( std::string val ) : value( std::move( val ) ) {}
+	explicit NumberExpr( std::string val ) : value( std::move( val ) ) {}
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
 		std::cout << "NumberExpr(" << YELLOW << value << CoRESET << ")\n";
@@ -29,9 +39,9 @@ struct NumberExpr : Expr {
 
 struct StringExpr : Expr {
 	std::string value;
-	StringExpr( std::string val ) : value( std::move( val ) ) {}
+	explicit StringExpr( std::string val ) : value( std::move( val ) ) {}
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
 		std::cout << "StringExpr(\"" << YELLOW << value << CoRESET << "\")\n";
@@ -40,7 +50,7 @@ struct StringExpr : Expr {
 
 struct IdentExpr : Expr {
 	std::string name;
-	IdentExpr( std::string nm ) : name( std::move( nm ) ) {}
+	explicit IdentExpr( std::string nm ) : name( std::move( nm ) ) {}
 
 	void print( int indentLevel ) const override
 	{
@@ -55,11 +65,22 @@ struct BinaryExpr : Expr {
 	std::unique_ptr<Expr> right;
 	TokenType operatr;
 
-	BinaryExpr( std::unique_ptr<Expr> lf, TokenType op, std::unique_ptr<Expr> rt )
-		 : left( std::move( lf ) ), operatr( op ), right( std::move( rt ) )
+	BinaryExpr( std::unique_ptr<Expr> lf, const TokenType op, std::unique_ptr<Expr> rt )
+		 : left( std::move( lf ) ), right( std::move( rt ) ), operatr( op )
 	{
 	}
+
+	void print( int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "BinaryExpr(" << BLUE << tokenTypeToString( operatr ) << CoRESET << ")\n";
+
+		left->print( indentLevel + 1 );
+		right->print( indentLevel + 1 );
+	}
 };
+
+/* --------------------------------------------------------------------------------------------- */
 
 struct Stmt {
 	virtual ~Stmt() = default;
@@ -72,12 +93,12 @@ struct VarDeclStmt : Stmt {
 	std::string name;
 	std::unique_ptr<Expr> expr;
 
-	VarDeclStmt( TokenType tp, std::string nm, std::unique_ptr<Expr> i )
+	VarDeclStmt( const TokenType tp, std::string nm, std::unique_ptr<Expr> i )
 		 : type( tp ), name( std::move( nm ) ), expr( std::move( i ) )
 	{
 	}
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
 		std::cout << "VarDeclStmt\n";
@@ -102,7 +123,7 @@ struct AssignStmt : Stmt {
 	{
 	}
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
 		std::cout << "AssignStmt\n";
@@ -128,7 +149,7 @@ struct IfStmt : Stmt {
 	{
 	}
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
 		std::cout << "IfStmt\n";
@@ -152,7 +173,7 @@ struct IfStmt : Stmt {
 struct BlockStmt : Stmt {
 	std::vector<std::unique_ptr<Stmt>> statements;
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
 		std::cout << "BlockStmt" << '\n';
@@ -172,10 +193,10 @@ struct WhileStmt : Stmt {
 	{
 	}
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
-		std::cout << "WHileLoopStmt:\n";
+		std::cout << "WhileLoopStmt:\n";
 
 		indent( indentLevel + 1 );
 		std::cout << "condition:\n";
@@ -186,22 +207,15 @@ struct WhileStmt : Stmt {
 		loopBody->print( indentLevel + 2 );
 	}
 };
-// # End of Global data
+
+/* --------------------------------------------------------------------------------------------- */
 
 class Parser {
  public:
 	explicit Parser( const std::vector<Token>& tokens );
 	std::vector<std::unique_ptr<Stmt>> parse();
 
- private:
-	const std::vector<Token>& m_tokens;
-	size_t m_pos = 0;
-
-	// helpers
-	const Token& peek() const;
-	const Token& advance();
-	bool match( TokenType type );
-	const Token& expect( TokenType type, const char* msg );
+	//  private:
 
 	// parsing
 	std::unique_ptr<Stmt> parseStatement();
@@ -213,4 +227,20 @@ class Parser {
 
 	std::unique_ptr<Expr> parseExpression();
 	std::unique_ptr<Expr> parsePrimary();
+
+	std::unique_ptr<Expr> parseEquality();
+	std::unique_ptr<Expr> parseComparison();
+	std::unique_ptr<Expr> parseTerm();
+	std::unique_ptr<Expr> parseFactor();
+	std::unique_ptr<Expr> parseUnary();
+
+ private:
+	const std::vector<Token>& m_tokens;
+	size_t m_pos = 0;
+
+	// helpers
+	[[nodiscard]] const Token& peek() const;
+	const Token& advance();
+	bool match( TokenType type );
+	const Token& expect( TokenType type, const char* msg );
 };

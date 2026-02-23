@@ -15,30 +15,32 @@ message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "LLVM dir: ${LLVM_DIR}")
 
 llvm_map_components_to_libnames(LLVM_LIBS
-    Core
-    Support
-    IRReader
-    X86CodeGen
+   Core
+   Support
+   IRReader
+   X86CodeGen
 )
 
 add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PUBLIC
-    src/main.cpp
-    src/parser.cpp
-    src/SemanticAnalyser.cpp
-    src/tokeniser.cpp
+   src/main.cpp
+   src/parser.cpp
+   src/SemanticAnalyser.cpp
+   src/tokeniser.cpp
+   src/interpreter/interpreter.cpp
 
-    src/headers/parser.hpp
-    src/headers/SemanticAnalyser.hpp
-    src/headers/tokeniser.hpp
-    src/headers/utils.hpp
 
+   src/headers/parser.hpp
+   src/headers/SemanticAnalyser.hpp
+   src/headers/tokeniser.hpp
+   src/headers/utils.hpp
+   src/interpreter/interpreter.hpp
 )
 
 target_include_directories(${PROJECT_NAME}
-    SYSTEM PRIVATE
-    ${LLVM_INCLUDE_DIRS}
+   SYSTEM PRIVATE
+   ${LLVM_INCLUDE_DIRS}
 ) # Marking them SYSTEM suppresses LLVM’s internal warnings from polluting the build when using /W4.
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${LLVM_DEFINITIONS})
 
@@ -47,36 +49,39 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${LLVM_LIBS})
 # C++ Modules MUST go in a FILE_SET
 # target_sources(${PROJECT_NAME} PRIVATE
 #     FILE_SET CXX_MODULES FILES
-#     src/tokeniser.ixx
+#         src/modules/tokeniser.ixx
+#         src/modules/utils.ixx
+#         src/modules/parser.ixx
+#         src/modules/SemanticAnalyser.ixx
 # )
-
+#
 # target_include_directories(${PROJECT_NAME} PRIVATE
 #     ${CMAKE_SOURCE_DIR}/include
 # )
 
 set(ABS_BIN_DIR ${CMAKE_SOURCE_DIR}/out/build/bin)
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${ABS_BIN_DIR}
-    LIBRARY_OUTPUT_DIRECTORY ${ABS_BIN_DIR}
-    ARCHIVE_OUTPUT_DIRECTORY ${ABS_BIN_DIR}
+   RUNTIME_OUTPUT_DIRECTORY ${ABS_BIN_DIR}
+   LIBRARY_OUTPUT_DIRECTORY ${ABS_BIN_DIR}
+   ARCHIVE_OUTPUT_DIRECTORY ${ABS_BIN_DIR}
 )
 
 # Compiler-specific options
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+   target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 # Debug-only flags
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    $<$<CONFIG:Debug>:DEBUG>
+   $<$<CONFIG:Debug>:DEBUG>
 )
 
 if(NOT MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Debug>:-g -O0>
-    )
+   target_compile_options(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Debug>:-g -O0>
+   )
 endif()
 
 # Enable testing
