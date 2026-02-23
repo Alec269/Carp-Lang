@@ -18,21 +18,23 @@ First implement a C-like syntax-ed language excluding pointers.
 
 ### Currently Supported Features
 
-- Tokenisation of the following tokens
+- Tokenisation, Parsing and Semantic Analysis of the following
   - *int* keyword
   - *string* keyword
+  - *bool* keyword
   - *identifier* (x,y,msg...)
   - `int literal` (5,543,33....)
   - *semicolon* (;)
   - Single-line and Block Comments
   - `string literal` ("hello world")
+  - `Booleans` (true, false)
   - *if* Keyword
   - *while* Keyword
   - basic structure of *if* and *while* statements
-  - Operators like `+, -, *, /, =, !=, >, <, >=, =<`
+  - Operators like `+, -, *, /, =, ==, !=, >, <, [<=, =<], [>=, =>]`
 - Expr support
   - literals: `5`, `"hello"`
-  - Vars: `x`, `y`, `z`...
+  - boolean: `true`, `false`
   - bracket expr: `(5 + 3)`
   - unary: `-`
   - Binary:
@@ -40,25 +42,32 @@ First implement a C-like syntax-ed language excluding pointers.
     - `-`
     - `*`
     - `/`
+    - `=`
+    - `==`
+    - `!=`
+    - `>`
+    - `<`
+    - `<=`, `=<`
+    - `>=`, `=>`
 - Stmt Support
   - var decls
-    - strings: `string name = "Bob";`
+    - string: `string name = "Bob";`
     - int: `int x = 5;`
-    - S.Analyser checks
+    - bool: `bool isStudent = true;`
+    - Semantic Analyser checks
       - Redeclaration
       - Type mismatch
   - Assignment
     - eg: `x = 10;`
-    - S.Analyser checks
+    - Semantic Analyser checks
       - Var exists
       - Type mismatch
   - If stmt
-    - `if (x) { ... } else { ... }`
+    - `if (x > 5) { ... } else { ... }`
     - Currently,
-    - conditions must evaluate to wither 1 or 0
-    - treating non-zero as true (just like C)
+    - conditions must evaluate to a boolean
   - while stmt
-    - `while () { ... }`
+    - `while ( x > 5) { ... }`
     - Same as if
 - Blocks and Scopes
   - x disappears after the ending brace
@@ -68,3 +77,13 @@ First implement a C-like syntax-ed language excluding pointers.
     int x = 5;
 }
 ```
+- printing the location of semantic error
+  ```c++
+  30| int v = "String";
+  ```
+  Output: 
+  
+  ```sh
+  Semantic Error:
+     Error at 30:6 -> Type mismatch in declaration of v
+  ```

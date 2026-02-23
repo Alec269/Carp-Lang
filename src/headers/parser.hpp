@@ -21,6 +21,7 @@ struct Environment {
 
 // default expression type
 struct Expr {
+	Location m_loc{};
 	virtual ~Expr() = default;	 // DESTRUCTOR
 	// HELPER FOR PRINTING AST STRUCTURE
 	virtual void print( int indent = 0 ) const = 0;
@@ -28,7 +29,10 @@ struct Expr {
 
 struct NumberExpr : Expr {
 	std::string value;
-	explicit NumberExpr( std::string val ) : value( std::move( val ) ) {}
+	explicit NumberExpr( std::string val, const Location l ) : value( std::move( val ) )
+	{
+		m_loc = l;
+	}
 
 	void print( const int indentLevel ) const override
 	{
@@ -39,7 +43,10 @@ struct NumberExpr : Expr {
 
 struct StringExpr : Expr {
 	std::string value;
-	explicit StringExpr( std::string val ) : value( std::move( val ) ) {}
+	explicit StringExpr( std::string val, const Location l ) : value( std::move( val ) )
+	{
+		m_loc = l;
+	}
 
 	void print( const int indentLevel ) const override
 	{
@@ -48,11 +55,28 @@ struct StringExpr : Expr {
 	}
 };
 
+struct BoolExpr : Expr {
+	bool value;
+	BoolExpr( bool val, const Location l ) : value( val )
+	{
+		m_loc = l;
+	}
+
+	void print( const int indentLevel ) const override
+	{
+		indent( indentLevel );
+		std::cout << "BoolExpr(\"" << YELLOW << ( value ? "true" : "false" ) << CoRESET << "\")\n";
+	}
+};
+
 struct IdentExpr : Expr {
 	std::string name;
-	explicit IdentExpr( std::string nm ) : name( std::move( nm ) ) {}
+	explicit IdentExpr( std::string nm, const Location l ) : name( std::move( nm ) )
+	{
+		m_loc = l;
+	}
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
 		std::cout << "IdentExpr(" << YELLOW << name << CoRESET << ")\n";
@@ -65,12 +89,14 @@ struct BinaryExpr : Expr {
 	std::unique_ptr<Expr> right;
 	TokenType operatr;
 
-	BinaryExpr( std::unique_ptr<Expr> lf, const TokenType op, std::unique_ptr<Expr> rt )
+	BinaryExpr( std::unique_ptr<Expr> lf, const TokenType op, std::unique_ptr<Expr> rt,
+					const Location l )
 		 : left( std::move( lf ) ), right( std::move( rt ) ), operatr( op )
 	{
+		m_loc = l;
 	}
 
-	void print( int indentLevel ) const override
+	void print( const int indentLevel ) const override
 	{
 		indent( indentLevel );
 		std::cout << "BinaryExpr(" << BLUE << tokenTypeToString( operatr ) << CoRESET << ")\n";
@@ -83,6 +109,7 @@ struct BinaryExpr : Expr {
 /* --------------------------------------------------------------------------------------------- */
 
 struct Stmt {
+	Location m_loc{};
 	virtual ~Stmt() = default;
 	virtual void print( int indent = 0 ) const = 0;
 };
@@ -93,9 +120,10 @@ struct VarDeclStmt : Stmt {
 	std::string name;
 	std::unique_ptr<Expr> expr;
 
-	VarDeclStmt( const TokenType tp, std::string nm, std::unique_ptr<Expr> i )
+	VarDeclStmt( const TokenType tp, std::string nm, std::unique_ptr<Expr> i, const Location l )
 		 : type( tp ), name( std::move( nm ) ), expr( std::move( i ) )
 	{
+		m_loc = l;
 	}
 
 	void print( const int indentLevel ) const override
@@ -118,9 +146,10 @@ struct VarDeclStmt : Stmt {
 struct AssignStmt : Stmt {
 	std::string name;
 	std::unique_ptr<Expr> value;
-	AssignStmt( std::string nm, std::unique_ptr<Expr> val )
+	AssignStmt( std::string nm, std::unique_ptr<Expr> val, const Location l )
 		 : name( std::move( nm ) ), value( std::move( val ) )
 	{
+		m_loc = l;
 	}
 
 	void print( const int indentLevel ) const override
@@ -142,11 +171,12 @@ struct IfStmt : Stmt {
 	std::unique_ptr<Stmt> thenBranch;
 	std::unique_ptr<Stmt> elseBranch;
 
-	IfStmt( std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> thenBr,
+	IfStmt( std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> thenBr, const Location l,
 			  std::unique_ptr<Stmt> elseBr = nullptr )
 		 : condition( std::move( cond ) ), thenBranch( std::move( thenBr ) ),
 			elseBranch( std::move( elseBr ) )
 	{
+		m_loc = l;
 	}
 
 	void print( const int indentLevel ) const override
@@ -187,10 +217,11 @@ struct WhileStmt : Stmt {
 	std::unique_ptr<Expr> condition;
 	std::unique_ptr<Stmt> loopBody;
 
-	WhileStmt( std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> lpBody )
+	WhileStmt( std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> lpBody, const Location l )
 		 : condition( std::move( cond ) ), loopBody( std::move( lpBody ) )
 
 	{
+		m_loc = l;
 	}
 
 	void print( const int indentLevel ) const override

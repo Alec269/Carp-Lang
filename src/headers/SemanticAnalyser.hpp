@@ -42,4 +42,9 @@ class SemanticAnalyser {
 
 	void declare( const std::string& name, TokenType type );
 	Symbol* lookup( const std::string& name );
+
+
+   [[noreturn]]
+   static void error( const Location& loc, const std::string& msg );
+
 };

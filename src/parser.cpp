@@ -20,7 +20,7 @@ const Token& Parser::peek() const
 // to say the current tk is valid and move on
 const Token& Parser::advance()
 {
-	return m_tokens[ m_pos++ ];  // Consumes the current token and advances to the next one
+	return m_tokens[ m_pos++ ];  // Consumes(returns) the current token and advances to the next one
 }
 
 bool Parser::match( const TokenType type )
@@ -51,23 +51,38 @@ const Token& Parser::expect( const TokenType type, const char* msg )
 // primary expression(numlit ,id, strlit) skeleton
 std::unique_ptr<Expr> Parser::parsePrimary()
 {
+	// num literal
 	if ( match( TokenType::T_numLit ) ) {
-		return std::make_unique<NumberExpr>( m_tokens[ m_pos - 1 ].value );
-		// Create a NumberExpr AST node using the value of the previously consumed token
-		// basically NumberExpr("5") from int x = 5 ;
-		// syntactically, it allocates memory for a object of type NumberExpr and returns it
-		// with that value  // m_pos - 1 refers to the token that was just consumed by match()
+		const Token& num = m_tokens[ m_pos - 1 ];
+		// After match() succeeds: match(TokenType::T_numLit)
+		// The parser has already consumed the token.
+		// So the consumed token is at: m_tokens[m_pos - 1]
+		return std::make_unique<NumberExpr>( num.value, num.loc );
 	}
+	// identifier
 	if ( match( TokenType::T_identifier ) ) {
-		return std::make_unique<IdentExpr>( m_tokens[ m_pos - 1 ].value );
+		const Token& id = m_tokens[ m_pos - 1 ];
+		return std::make_unique<IdentExpr>( id.value, id.loc );
 	}
+	// string literal
 	if ( match( TokenType::T_strLit ) ) {
-		return std::make_unique<StringExpr>( m_tokens[ m_pos - 1 ].value );
+		const Token& str = m_tokens[ m_pos - 1 ];
+		return std::make_unique<StringExpr>( str.value, str.loc );
 	}
 	if ( match( TokenType::T_LBrack ) ) {
 		auto expr = parseExpression();
 		expect( TokenType::T_RBrack, "Expected ')'" );
 		return expr;
+	}
+
+	// bool true
+	if ( match( TokenType::T_true ) ) {
+		const Token& trueToken = m_tokens[ m_pos - 1 ];
+		return std::make_unique<BoolExpr>( true, trueToken.loc );
+	}
+	if ( match( TokenType::T_false ) ) {
+		const Token& falseToken = m_tokens[ m_pos - 1 ];
+		return std::make_unique<BoolExpr>( false, falseToken.loc );
 	}
 
 	throw std::runtime_error( "Expected expression" );
@@ -88,7 +103,7 @@ std::unique_ptr<Expr> Parser::parseComparison()
 			  match( TokenType::T_LeTEq ) ) {
 		TokenType op = m_tokens[ m_pos - 1 ].type;
 		auto right = parseTerm();
-		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ) );
+		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ), expr->m_loc );
 	}
 	return expr;
 }
@@ -100,8 +115,9 @@ std::unique_ptr<Expr> Parser::parseUnary()
 		auto right = parseUnary();
 
 		// Treat unary minus as binary (0 - expr) ; [apparently works flawlessly]
-		auto zero = std::make_unique<NumberExpr>( "0" );
-		return std::make_unique<BinaryExpr>( std::move( zero ), op, std::move( right ) );
+		auto zero = std::make_unique<NumberExpr>( "0", right->m_loc );
+		return std::make_unique<BinaryExpr>( std::move( zero ), op, std::move( right ),
+														 right->m_loc );
 	}
 	return parsePrimary();
 }
@@ -113,7 +129,7 @@ std::unique_ptr<Expr> Parser::parseFactor()
 	while ( match( TokenType::T_star ) || match( TokenType::T_slash ) ) {
 		TokenType op = m_tokens[ m_pos - 1 ].type;
 		auto right = parseUnary();
-		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ) );
+		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ), expr->m_loc );
 	}
 	return expr;
 }
@@ -122,10 +138,10 @@ std::unique_ptr<Expr> Parser::parseEquality()
 {
 	auto expr = parseComparison();
 
-	while ( match( TokenType::T_eq ) || match( TokenType::T_NotE ) ) {
+	while ( match( TokenType::T_eqEq ) || match( TokenType::T_NotE ) ) {
 		TokenType op = m_tokens[ m_pos - 1 ].type;
 		auto right = parseComparison();
-		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ) );
+		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ), expr->m_loc );
 	}
 	return expr;
 	// What this does:
@@ -141,7 +157,7 @@ std::unique_ptr<Expr> Parser::parseTerm()
 	while ( match( TokenType::T_plus ) || match( TokenType::T_minus ) ) {
 		TokenType op = m_tokens[ m_pos - 1 ].type;
 		auto right = parseFactor();
-		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ) );
+		expr = std::make_unique<BinaryExpr>( std::move( expr ), op, std::move( right ), expr->m_loc );
 	}
 	return expr;
 }
@@ -163,7 +179,7 @@ std::unique_ptr<Stmt> Parser::parseVarDecl()
 	expect( TokenType::T_semi, "Expected ';'" );
 	// after making sure the structure is correct,
 	// we return the type, identifier and value of the var via a varStmt node
-	return std::make_unique<VarDeclStmt>( type, nameToken.value, std::move( init ) );
+	return std::make_unique<VarDeclStmt>( type, nameToken.value, std::move( init ), nameToken.loc );
 }
 
 /* --------------------------------------------------------------------------------------------- */
@@ -175,7 +191,7 @@ std::unique_ptr<Stmt> Parser::parseAssignment()
 	auto value = parseExpression();
 	expect( TokenType::T_semi, "Expected ';'" );
 
-	return std::make_unique<AssignStmt>( name.value, std::move( value ) );
+	return std::make_unique<AssignStmt>( name.value, std::move( value ), name.loc );
 }
 
 /* --------------------------------------------------------------------------------------------- */
@@ -183,7 +199,7 @@ std::unique_ptr<Stmt> Parser::parseAssignment()
 std::unique_ptr<Stmt> Parser::parseIfStmt()
 {
 	// consume if
-	expect( TokenType::T_if, "Expected 'if'" );
+	const Token& ifTok = expect( TokenType::T_if, "Expected 'if'" );
 	// expect '('
 	expect( TokenType::T_LBrack, "Expect '(' after 'if'" );
 	// parse the condition  expr
@@ -199,7 +215,7 @@ std::unique_ptr<Stmt> Parser::parseIfStmt()
 		elseBranch = parseStatement();
 	}
 
-	return std::make_unique<IfStmt>( std::move( condition ), std::move( thenBranch ),
+	return std::make_unique<IfStmt>( std::move( condition ), std::move( thenBranch ), ifTok.loc,
 												std::move( elseBranch ) );
 }
 
@@ -207,8 +223,8 @@ std::unique_ptr<Stmt> Parser::parseIfStmt()
 
 std::unique_ptr<Stmt> Parser::parseWhileStmt()
 {
-	// consume if
-	expect( TokenType::T_while, "Expected 'while'" );
+	// consume while
+	const Token& whileTok = expect( TokenType::T_while, "Expected 'while'" );
 	// expect '('
 	expect( TokenType::T_LBrack, "Expect '(' after 'while'" );
 	// parse the condition  expr
@@ -216,14 +232,15 @@ std::unique_ptr<Stmt> Parser::parseWhileStmt()
 	// expect ')'
 	expect( TokenType::T_RBrack, "Expect ')' after 'condition'" );
 	auto whileBody = parseStatement();	// get the body
-	return std::make_unique<WhileStmt>( std::move( condition ), std::move( whileBody ) );
+	return std::make_unique<WhileStmt>( std::move( condition ), std::move( whileBody ),
+													whileTok.loc );
 }
 
 /* --------------------------------------------------------------------------------------------- */
 
 std::unique_ptr<Stmt> Parser::parseBlock()
 {
-	expect( TokenType::T_LBrace, "Expected '{'" );
+	const Token& lbrace = expect( TokenType::T_LBrace, "Expected '{'" );
 
 	auto block = std::make_unique<BlockStmt>();
 
@@ -231,6 +248,9 @@ std::unique_ptr<Stmt> Parser::parseBlock()
 		block->statements.push_back( parseStatement() );
 	}
 	expect( TokenType::T_RBrace, "Expected '}'" );
+
+	block->m_loc = lbrace.loc;
+
 	return block;
 }
 
@@ -243,6 +263,7 @@ std::unique_ptr<Stmt> Parser::parseStatement()
 	case TokenType::T_int:
 	case TokenType::T_float:
 	case TokenType::T_string:
+	case TokenType::T_bool:
 		return parseVarDecl();
 	case TokenType::T_identifier:
 		return parseAssignment();
@@ -269,21 +290,3 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse()
 	}
 	return stmts;
 }
-
-/*
-
-#@ `std::make_unique<NumberExpr>( m_tokens[m_pos - 1].value )`
-
-This does three things:
-
-- Allocates a new NumberExpr on the heap
-- Copies the string value (e.g. "5") into it
-- Returns std::unique_ptr<Expr>
-
-Important:
-
-- The AST node does not reference the token
-- The token can disappear later
-- The AST survives independently
-
-*/

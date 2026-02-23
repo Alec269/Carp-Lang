@@ -19,6 +19,12 @@ void SemanticAnalyser::exitScope()
 	scopeStack.pop_back();	// remove the last element [meaning exit]
 }
 
+[[noreturn]]
+void SemanticAnalyser::error( const Location& loc, const std::string& msg )
+{
+	throw std::runtime_error( "Error at " + std::to_string( loc.line ) + ":" +
+									  std::to_string( loc.column ) + " -> " + msg );
+}
 /* --------------------------------------------------------------------------------------------- */
 
 // returns a pointer to the Symbol of an identifier, if that id exists in any active scope.
@@ -69,50 +75,67 @@ void SemanticAnalyser::declare( const std::string& name, const TokenType type )
 // answers: What type does this expression evaluate to?
 TokenType SemanticAnalyser::visitExpr( const Expr* expr )
 {
+	// # Number
 	if ( auto num = dynamic_cast<const NumberExpr*>( expr ) ) {
 		return TokenType::T_int;
 	}
-	/*	What dynamic_cast does
-		Checks runtime type
-			Returns:
-				- pointer → if cast succeeds
-				- nullptr → if it fails
-		Why it works
-			Because:
-				Expr has a virtual destructor:
-					- That gives it a vtable
-					- RTTI is enabled
-				This line does three things:
-					- Tries to cast expr
-					- Stores result in num
-					- Tests num != nullptr
-	*/
+	// # String
+	if ( auto str = dynamic_cast<const StringExpr*>( expr ) ) {
+		return TokenType::T_string;
+	}
+	// # Identifier
 	if ( const auto id = dynamic_cast<const IdentExpr*>( expr ) ) {  // if it has id
 		const Symbol* sym = lookup( id->name );							  // check the entire scope-stack
 		// ↑ get id [Pointer lets you express absence (nullptr)]
 		if ( !sym ) {
-			throw std::runtime_error( "Use of undeclared variable: " + id->name );
+			error( id->m_loc, "Use of undeclared variable: " + id->name );
 		}
 		return sym->tType;
 		// basically, if identifier(symbol) exists return its type
 	}
-
-	if ( auto str = dynamic_cast<const StringExpr*>( expr ) ) {
-		return TokenType::T_string;
+	// # bool
+	if ( auto b = dynamic_cast<const BoolExpr*>( expr ) ) {
+		return TokenType::T_bool;
 	}
 
+	// # Binary
 	if ( const auto bin = dynamic_cast<const BinaryExpr*>( expr ) ) {
 		const TokenType leftType = visitExpr( bin->left.get() );
 		const TokenType rightType = visitExpr( bin->right.get() );
 		// ↑ recursively ask what type, the stuff on both side is | (x+3)
 
-		if ( leftType != rightType ) {
-			throw std::runtime_error( "Type mismatch in binary expression" );
-		}	// if types matches just return type of one
-		return leftType;
+		switch ( bin->operatr ) {
+			// Arithmatic
+		case TokenType::T_plus:
+		case TokenType::T_minus:
+		case TokenType::T_star:
+		case TokenType::T_slash:
+			if ( leftType != TokenType::T_int || rightType != TokenType::T_int ) {
+				error( bin->m_loc, "Arithmetic operators require int operands" );
+			}
+			return TokenType::T_int;
+		// Comparison
+		case TokenType::T_GrT:
+		case TokenType::T_LeT:
+		case TokenType::T_GrTEq:
+		case TokenType::T_LeTEq:
+			if ( leftType != TokenType::T_int || rightType != TokenType::T_int ) {
+				error( bin->m_loc, "Comparison requires int operands" );
+			}
+			return TokenType::T_bool;
+		// Equality
+		case TokenType::T_eqEq:
+		case TokenType::T_NotE:
+			if ( leftType != rightType ) {
+				error( bin->m_loc, "Equality operands must be same Type" );
+			}
+			return TokenType::T_bool;
+		default:
+			error( bin->m_loc, "Unknown Binary Operator" );
+		}
 	}
 
-	throw std::runtime_error( "Unknown expression type" );
+	error( expr->m_loc, "Unknown expression type" );
 }
 /* --------------------------------------------------------------------------------------------- */
 // This is a dispatcher that walks the AST and enforces semantic rules.
@@ -126,7 +149,7 @@ void SemanticAnalyser::visitStmt( const Stmt* stmt )
 		const TokenType exprType = visitExpr( v->expr.get() );  // visitExpr returns a TokenType
 		// get the expr type (like intLit/strLit etc) and compare
 		if ( exprType != v->type ) {	// here v->type is the type decl like int,string,float
-			throw std::runtime_error( "Type mismatch in declaration of " + v->name );
+			error( v->m_loc, "Type mismatch in declaration of " + v->name );
 		}
 		declare( v->name, v->type );	// this stores it in current scope within scope-stack
 		return;
@@ -135,11 +158,11 @@ void SemanticAnalyser::visitStmt( const Stmt* stmt )
 	if ( const auto a = dynamic_cast<const AssignStmt*>( stmt ) ) {
 		const Symbol* sym = lookup( a->name );	 // check if id exists or not
 		if ( !sym ) {
-			throw std::runtime_error( "Assignment to undeclared variable: " + a->name );
+			error( a->m_loc, "Assignment to undeclared variable: " + a->name );
 		}
 		const TokenType valueType = visitExpr( a->value.get() );	 // get the expr
 		if ( valueType != sym->tType ) {
-			throw std::runtime_error( "Type mismatch in assignment to " + a->name );
+			error( a->m_loc, "Type mismatch in assignment to " + a->name );
 		}
 		return;
 	}
@@ -159,8 +182,8 @@ void SemanticAnalyser::visitStmt( const Stmt* stmt )
 	// if
 	if ( const auto i = dynamic_cast<const IfStmt*>( stmt ) ) {
 		const auto condType = visitExpr( i->condition.get() );
-		if ( condType != TokenType::T_int ) {
-			throw std::runtime_error( "condition expression must evaluate to int" );
+		if ( condType != TokenType::T_bool ) {
+			error( i->m_loc, "condition expression must evaluate to a boolean" );
 		}
 		visitStmt( i->thenBranch.get() );
 		if ( i->elseBranch ) {
@@ -171,8 +194,8 @@ void SemanticAnalyser::visitStmt( const Stmt* stmt )
 	// while
 	if ( const auto w = dynamic_cast<const WhileStmt*>( stmt ) ) {
 		const auto condType = visitExpr( w->condition.get() );
-		if ( condType != TokenType::T_int ) {
-			throw std::runtime_error( "condition expression must evaluate to int" );
+		if ( condType != TokenType::T_bool ) {
+			error( w->m_loc, "condition expression must evaluate to a boolean" );
 		}
 		visitStmt( w->loopBody.get() );
 		return;

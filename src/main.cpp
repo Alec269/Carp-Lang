@@ -53,7 +53,7 @@ int main( int argc, char* argv[] )
 
 	} catch ( const std::exception& err ) {
 
-		std::cerr << RED << "Parse Error: " << err.what() << CoRESET << "\n";
+		std::cerr << RED << "Parse Error: \n   " << err.what() << CoRESET << "\n";
 	}
 	// hello
 	// @ Semantic analyser
@@ -62,7 +62,7 @@ int main( int argc, char* argv[] )
 		semAnalyser.analyse( nodes );
 	} catch ( const std::exception& err ) {
 
-		std::cerr << RED << "Semantic Error: " << err.what() << CoRESET << "\n";
+		std::cerr << RED << "Semantic Error: \n   " << err.what() << CoRESET << "\n";
 	}
 
 	return 0;

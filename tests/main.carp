@@ -1,26 +1,47 @@
 // variable declarations
 int x = 5;
-/* long y = 10; */
-//float z = 3;
 string msg = "hello world";
-//string msg = "hello world";
+bool isStudent = true;
 
-
-if (x) {
+if (x > 5) {
    string msg = "value is five";
    msg = "jj";
 }
 
-
-while (x) {
+while (x < 5) {
    msg = "mono sodium glutamate";
-   if (x) {
+   if (x > 4) {
       int v = 6;
    }
 }
 
+// Binary operations
 x = 5 + 3 * 2;
 int y = (5 + 3) * 2;
 int z = x + y * 4;
 int m = x + y * 4 / 6;
+
+// int vv = "hello";        // should fail
+// int vm = 5 + "test";     // should fail
+// bb = 5;                  // undeclared
+// if ("Jeff") {}              // should fail
+// while ("Bob") {}            // should fail
+
+ int v = "String";
+
+{
+ int x = 5;
+}
+
+int mm = 5 + 2;
+int v = x * 3;
+
+if ( v > 5 ) {}
+if ( v < 5 ) {}
+if ( v <= 5 ) {}
+if ( v >= 5) {}
+if ( v == 5 ) {}
+if ( v =< 5 ) {}
+if ( v => 5 ) {}
+if ( v != 5 ) {}
 

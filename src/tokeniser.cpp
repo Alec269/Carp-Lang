@@ -243,6 +243,12 @@ std::vector<Token> Tokeniser::tokenise()
 			if ( peek() == '=' ) {
 				advance();
 				addToken( TokenType::T_eqEq, "==", startColumn );
+			} else if ( peek() == '>' ) {
+				advance();
+				addToken( TokenType::T_GrTEq, "=>", startColumn );
+			} else if ( peek() == '<' ) {
+				advance();
+				addToken( TokenType::T_LeTEq, "=<", startColumn );
 			} else {
 				addToken( TokenType::T_eq, "=", startColumn );
 			}
